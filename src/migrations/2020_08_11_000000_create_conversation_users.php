@@ -31,7 +31,7 @@ class CreateConversationUsers extends Migration {
      */
     public function down()
     {
-        Schema::drop('conv_users');
+        Schema::drop('conversation_users');
     }
 
 }

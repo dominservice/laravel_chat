@@ -271,7 +271,7 @@ class LaravelChat {
     public function markUnreadAllMessagesInConversation($conv_id, $user_id) {
         DB::statement(
             '
-            UPDATE messages_status mst
+            UPDATE message_statuses mst
             SET mst.status=?
             WHERE mst.user_id=?
             AND mst.status=?

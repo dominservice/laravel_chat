@@ -32,7 +32,7 @@ class CreateMessageStatuses extends Migration {
 	 */
 	public function down()
 	{
-        Schema::drop('messages_status');
+        Schema::drop('message_statuses');
 	}
 
 }
