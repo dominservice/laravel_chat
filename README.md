@@ -39,7 +39,11 @@ Publish config:
 ```
 php artisan vendor:publish --provider="Dominservice\LaravelChat\LaravelChatServiceProvider" --tag="config"
 ```
-	
+Migrate
+```
+php artisan migrate
+```
+
 # Usage
 
 
