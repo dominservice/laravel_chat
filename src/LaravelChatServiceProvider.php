@@ -18,12 +18,12 @@ class LaravelChatServiceProvider extends ServiceProvider {
 
     public function boot() {
         $this->publishes([
-            __DIR__.'/../../config/laravel_chat.php' => config_path('laravel_chat.php'),
+            __DIR__ . '/Config/laravel_chat.php' => config_path('laravel_chat.php'),
         ], 'config');
 
         // Publish your migrations
         $this->publishes([
-            __DIR__.'/../../migrations/' => base_path('/database/migrations')
+            __DIR__ . '/Migrations/' => base_path('/database/migrations')
         ], 'migrations');
     }
 
