@@ -1,28 +1,22 @@
 <?php
-/**
- * This awesome file created by:
- * tzookb
- * Enjoy!
- * Date: 6/11/14
- */
-
 namespace Dominservice\LaravelChat\Entities;
-
 
 use Illuminate\Support\Collection;
 
-class Conversation {
-
+/**
+ * Class Conversation
+ * @package Dominservice\LaravelChat\Entities
+ */
+class Conversation
+{
     protected $id;
     protected $participants;
     protected $messages;
     protected $created;
-
     protected $type;
 
     const GROUP = 'group';
     const COUPLE = 'couple';
-
 
     function __construct()
     {

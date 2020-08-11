@@ -1,7 +1,6 @@
 <?php
 namespace Dominservice\LaravelChat;
 
-
 use DB;
 use Config;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -19,6 +18,10 @@ use Dominservice\LaravelChat\Models\Eloquent\ConversationUsers;
 use Dominservice\LaravelChat\Models\Eloquent\MessageStatus;
 use Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository;
 
+/**
+ * Class LaravelChat
+ * @package Dominservice\LaravelChat
+ */
 class LaravelChat {
 
     const DELETED = 0;
@@ -105,14 +108,14 @@ class LaravelChat {
         $convsIds = [];
         foreach ( $convs as $conv ) {
             //this is for the query later
-            $convsIds[] = $conv->conv_id;
+            $convsIds[] = $conv->conversation_id;
 
             //this is for the return result
             $conv->users = [];
-            $return[$conv->conv_id] = $conv;
+            $return[$conv->conversation_id] = $conv;
 
             $conversation = new Conversation();
-            $conversation->setId( $conv->conv_id );
+            $conversation->setId( $conv->conversation_id );
 
             $message = new Message();
             $message->setId( $conv->msgId );
@@ -136,9 +139,9 @@ class LaravelChat {
                     $user = new \stdClass();
                     $user->id = $usersInConv->id;
                     //this is for the return result
-                    $return[$usersInConv->conv_id]->users[$user->id] = $user;
+                    $return[$usersInConv->conversation_id]->users[$user->id] = $user;
                 }
-                $conversations[ $usersInConv->conv_id ]->addParticipant( $usersInConv->id );
+                $conversations[ $usersInConv->conversation_id ]->addParticipant( $usersInConv->id );
             }
         }
 
@@ -272,10 +275,10 @@ class LaravelChat {
             SET mst.status=?
             WHERE mst.user_id=?
             AND mst.status=?
-            AND mst.msg_id IN (
+            AND mst.message_id IN (
               SELECT msg.id
               FROM messages msg
-              WHERE msg.conv_id=?
+              WHERE msg.conversation_id=?
               AND msg.sender_id!=?
             )
             ',

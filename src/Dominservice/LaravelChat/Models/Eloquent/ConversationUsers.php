@@ -1,18 +1,13 @@
 <?php
 namespace Dominservice\LaravelChat\Models\Eloquent;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Created by PhpStorm.
- * User: tzookb
- * Date: 3/21/14
- * Time: 6:20 PM
+ * Class ConversationUsers
+ * @package Dominservice\LaravelChat\Models\Eloquent
  */
-
-class ConversationUsers  extends Model {
-    protected $table = 'conv_users';
+class ConversationUsers  extends Model
+{
     public $timestamps = false;
-
-    public function __construct() {
-    }
 } 

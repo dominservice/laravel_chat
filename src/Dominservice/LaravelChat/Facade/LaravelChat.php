@@ -4,6 +4,10 @@ namespace Dominservice\LaravelChat\Facade;
 
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * Class LaravelChat
+ * @package Dominservice\LaravelChat\Facade
+ */
 class LaravelChat extends Facade
 {
 

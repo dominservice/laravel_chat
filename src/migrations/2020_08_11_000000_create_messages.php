@@ -17,12 +17,12 @@ class CreateMessages extends Migration {
         {
             $table->increments('id');
             $table->integer('sender_id');
-            $table->integer('conv_id');
+            $table->integer('conversation_id');
             $table->text('content');
             $table->timestamps();
 
             $table->index('sender_id');
-            $table->index('conv_id');
+            $table->index('conversation_id');
 
         });
 	}

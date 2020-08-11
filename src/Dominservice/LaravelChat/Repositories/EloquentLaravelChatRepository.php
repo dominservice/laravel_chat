@@ -1,13 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tzookb
- * Date: 7/6/14
- * Time: 10:58 AM
- */
-
 namespace Dominservice\LaravelChat\Repositories;
-
 
 use Illuminate\Database\DatabaseManager;
 use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
@@ -19,6 +11,10 @@ use Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository;
 use Dominservice\LaravelChat\Models\Eloquent\Message as MessageEloquent;
 use Dominservice\LaravelChat\Models\Eloquent\Conversation as ConversationEloquent;
 
+/**
+ * Class EloquentLaravelChatRepository
+ * @package Dominservice\LaravelChat\Repositories
+ */
 class EloquentLaravelChatRepository implements iLaravelChatRepository
 {
     protected $usersTable;
@@ -57,7 +53,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
 
     protected function addConvUserRow($conv_id, $user_id) {
         $this->db->table($this->tablePrefix.'conv_users')->insert(
-            array('conv_id' => $conv_id, 'user_id' => $user_id)
+            array('conversation_id' => $conv_id, 'user_id' => $user_id)
         );
     }
 
@@ -69,7 +65,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
         //if so add new message
         $message = new MessageEloquent();
         $message->sender_id = $user_id;
-        $message->conv_id = $conv_id;
+        $message->conversation_id = $conv_id;
         $message->content = $content;
         $message->save();
 
@@ -80,7 +76,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
         foreach ( $usersInConv as $userInConv ) {
             $messageStatus = new MessageStatus();
             $messageStatus->user_id = $userInConv;
-            $messageStatus->msg_id = $message->id;
+            $messageStatus->message_id = $message->id;
             if ( $userInConv == $user_id ) {
                 //its the sender user
                 $messageStatus->self = 1;
@@ -104,15 +100,15 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function getConversationByTwoUsers($userA_id, $userB_id) {
         $results = $this->db->select(
             '
-            SELECT cu.conv_id
+            SELECT cu.conversation_id
             FROM conv_users cu
             WHERE cu.user_id=? OR cu.user_id=?
-            GROUP BY cu.conv_id
-            HAVING COUNT(cu.conv_id)=2
+            GROUP BY cu.conversation_id
+            HAVING COUNT(cu.conversation_id)=2
             '
             , [$userA_id, $userB_id]);
         if( count($results) == 1 ) {
-            return (int)$results[0]->conv_id;
+            return (int)$results[0]->conversation_id;
         }
         throw new ConversationNotFoundException;
     }
@@ -123,7 +119,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
             UPDATE '.$this->tablePrefix.'messages_status
             SET status=?
             WHERE user_id=?
-            AND msg_id=?
+            AND message_id=?
             ',
             [$status, $userId, $msgId]
         );
@@ -145,9 +141,9 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function isUserInConversation($conv_id, $user_id) {
         $res = $this->db
             ->table($this->tablePrefix.'conv_users')
-            ->select('conv_id', 'user_id')
+            ->select('conversation_id', 'user_id')
             ->where('user_id', $user_id)
-            ->where('conv_id', $conv_id)
+            ->where('conversation_id', $conv_id)
             ->first();
 
         if(is_null($res))
@@ -160,7 +156,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
             '
             SELECT cu.user_id
             FROM '.$this->tablePrefix.'conv_users cu
-            WHERE cu.conv_id=?
+            WHERE cu.conversation_id=?
             ',
             [$conv_id]
         );
@@ -194,10 +190,10 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
         SET status=?
         WHERE user_id=?
         AND status=?
-        AND msg_id IN (
+        AND message_id IN (
           SELECT id
           FROM messages
-          WHERE conv_id=?
+          WHERE conversation_id=?
           AND sender_id!=?
         )
         ',
@@ -213,10 +209,10 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
             UPDATE '.$this->tablePrefix.'messages_status mst
             SET mst.status='.self::DELETED.'
             WHERE mst.user_id=?
-            AND mst.msg_id IN (
+            AND mst.message_id IN (
               SELECT msg.id
               FROM messages msg
-              WHERE msg.conv_id=?
+              WHERE msg.conversation_id=?
             )
             ',
             [$user_id, $conv_id]
@@ -235,8 +231,8 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
             SELECT msg.id as "msgId", msg.content, mst.status, msg.created_at, msg.sender_id as "userId"
             FROM '.$this->tablePrefix.'messages_status mst
             INNER JOIN '.$this->tablePrefix.'messages msg
-            ON mst.msg_id=msg.id
-            WHERE msg.conv_id=?
+            ON mst.message_id=msg.id
+            WHERE msg.conversation_id=?
             AND mst.user_id = ?
             AND mst.status NOT IN (?,?)
             ORDER BY msg.created_at '.$orderBy.'
@@ -248,14 +244,14 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     {
         return $this->db->select(
             '
-            SELECT msg.conv_id as conv_id, msg.created_at, msg.id "msgId", msg.content, mst.status, mst.self, us.'.$this->usersTableKey.' "userId"
+            SELECT msg.conversation_id as conversation_id, msg.created_at, msg.id "msgId", msg.content, mst.status, mst.self, us.'.$this->usersTableKey.' "userId"
             FROM '.$this->tablePrefix.'messages msg
             INNER JOIN (
                 SELECT MAX(created_at) created_at
                 FROM '.$this->tablePrefix.'messages
-                GROUP BY conv_id
+                GROUP BY conversation_id
             ) m2 ON msg.created_at = m2.created_at
-            INNER JOIN '.$this->tablePrefix.'messages_status mst ON msg.id=mst.msg_id
+            INNER JOIN '.$this->tablePrefix.'messages_status mst ON msg.id=mst.message_id
             INNER JOIN '.$this->usersTable.' us ON msg.sender_id=us.'.$this->usersTableKey.'
             WHERE mst.user_id = ? AND mst.status NOT IN (?, ?)
             ORDER BY msg.created_at DESC
@@ -267,11 +263,11 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     {
         return $this->db->select(
             '
-                SELECT cu.conv_id, us.'.$this->usersTableKey.'
+                SELECT cu.conversation_id, us.'.$this->usersTableKey.'
                 FROM '.$this->tablePrefix.'conv_users cu
                 INNER JOIN '.$this->usersTable.' us
                 ON cu.user_id=us.'.$this->usersTableKey.'
-                WHERE cu.conv_id IN('.$convsIds.')
+                WHERE cu.conversation_id IN('.$convsIds.')
             '
             , []);
     }

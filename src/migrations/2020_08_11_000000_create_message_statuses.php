@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMessagesStatus extends Migration {
+class CreateMessageStatuses extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -13,15 +13,15 @@ class CreateMessagesStatus extends Migration {
 	 */
 	public function up()
 	{
-        Schema::create('messages_status', function(Blueprint $table)
+        Schema::create('message_statuses', function(Blueprint $table)
         {
             $table->increments('id');
             $table->integer('user_id');
-            $table->integer('msg_id');
+            $table->integer('message_id');
             $table->boolean('self');
             $table->integer('status');
 
-            $table->index('msg_id');
+            $table->index('message_id');
         });
 	}
 

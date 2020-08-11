@@ -3,7 +3,10 @@
 use Illuminate\Support\ServiceProvider;
 use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
 
-
+/**
+ * Class LaravelChatServiceProvider
+ * @package Dominservice\LaravelChat
+ */
 class LaravelChatServiceProvider extends ServiceProvider {
 
 	/**

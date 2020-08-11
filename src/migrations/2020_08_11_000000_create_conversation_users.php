@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateConvUsers extends Migration {
+class CreateConversationUsers extends Migration {
 
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateConvUsers extends Migration {
      */
     public function up()
     {
-        Schema::create('conv_users', function(Blueprint $table)
+        Schema::create('conversation_users', function(Blueprint $table)
         {
-            $table->integer('conv_id')->nullable();
+            $table->integer('conversation_id')->nullable();
             $table->integer('user_id')->nullable();
 
 
-            $table->primary(array('conv_id', 'user_id'));
+            $table->primary(array('conversation_id', 'user_id'));
 
         });
     }

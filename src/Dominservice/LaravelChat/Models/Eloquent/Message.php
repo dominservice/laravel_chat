@@ -1,17 +1,13 @@
 <?php
 namespace Dominservice\LaravelChat\Models\Eloquent;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Created by PhpStorm.
- * User: tzookb
- * Date: 3/21/14
- * Time: 6:20 PM
+ * Class Message
+ * @package Dominservice\LaravelChat\Models\Eloquent
  */
+class Message extends Model
+{
 
-class Message extends Model {
-
-    public function __construct() {
-
-    }
 } 

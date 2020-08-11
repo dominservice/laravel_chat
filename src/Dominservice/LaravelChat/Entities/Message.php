@@ -1,21 +1,16 @@
 <?php
-/**
- * This awesome file created by:
- * tzookb
- * Enjoy!
- * Date: 6/11/14
- */
-
 namespace Dominservice\LaravelChat\Entities;
 
-class Message {
-
+/**
+ * Class Message
+ * @package Dominservice\LaravelChat\Entities
+ */
+class Message
+{
     protected $id;
     protected $sender;
     protected $status;
-
     protected $self;
-
     protected $content;
     protected $created;
 
@@ -118,8 +113,4 @@ class Message {
     public function getSelf() {
         return $this->self;
     }
-
-
-
-
 } 
