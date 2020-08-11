@@ -37,7 +37,7 @@ Add the service provider to `config/app.php`
 Publish config:
 
 ```
-php artisan vendor:publish --provider="CDominservice\LaravelChat\LaravelChatServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Dominservice\LaravelChat\LaravelChatServiceProvider" --tag="config"
 ```
 	
 # Usage
