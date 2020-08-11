@@ -1,8 +1,8 @@
 <?php 
 
 return array(
-    'usersTable' => 'users',
-    'usersTableKey' => 'id',
-    'tablePrefix' => '',
+    'users_table' => 'users',
+    'users_table_key' => 'id',
+    'table_prefix' => '',
 
 );

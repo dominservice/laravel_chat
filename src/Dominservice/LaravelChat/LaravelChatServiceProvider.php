@@ -31,9 +31,9 @@ class LaravelChatServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-        $usersTable = \Config::get('laravel_chat.usersTable', 'users');
-        $usersTableKey = \Config::get('laravel_chat.usersTableKey', 'id');
-        $tablePrefix = \Config::get('laravel_chat.tablePrefix', '');
+        $usersTable = \Config::get('laravel_chat.users_table', 'users');
+        $usersTableKey = \Config::get('laravel_chat.users_table_key', 'id');
+        $tablePrefix = \Config::get('laravel_chat.table_prefix', '');
 
         $this->app->bind('Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository',
             function($app) use($tablePrefix, $usersTable, $usersTableKey) {
