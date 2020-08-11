@@ -28,6 +28,9 @@
         "psr-0": {
             "Dominservice\\LaravelChat": "src/"
         },
+        "files": [
+            "src/Helpers/helpers.php"
+        ],
         "classmap": [
             "src/migrations/"
         ]
