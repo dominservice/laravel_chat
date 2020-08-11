@@ -165,10 +165,53 @@ public function conversations($convId=null) {
 }
 ```
 ## Helpers
-Get all conversations for user
+Get all conversations for user. If `userId` is `null` then set current user id.
 ```php
 get_conversations($userId = null);
 ```
+Create conversations between selected users, in array must be `id` list.
+```php
+set_conversation($users = []);
+```
+Delete conversations for user. If `userId` is `null` then set current user id.
+```php
+delete_conversation($convId, $userId = null);
+```
+Check is user in conversations. If `userId` is `null` then set current user id.
+```php
+in_conversation($convId, $userId = null);
+```
+Add message to conversations. If `userId` is `null` then set current user id.
+```php
+conversation_add_message($convId, $content, $userId = null);
+```
+Add message to conversations between two users, it also create conversation if not exist, or add to exist. If `senderId` is `null` then set current user id.
+```php
+conversation_add_message_between($content, $receiverId, $senderId = null);
+```
+Get count unread messages for user. If `userId` is `null` then set current user id.
+```php
+conversation_unread_count($userId = null);
+```
+Get conversation between two users. If `senderId` is `null` then set current user id.
+```php
+conversation_between($receiverId, $senderId = null);
+```
+Get conversation messages. If `userId` is `null` then set current user id.
+```php
+conversation_messages($convId, $userId = null, $newToOld = true);
+```
+Mark messages. If `userId` is `null` then set current user id.
+```php
+conversation_mark_as_archived($msgId, $userId = null);
+conversation_mark_as_deleted($msgId, $userId = null);
+conversation_mark_as_unread($msgId, $userId = null);
+conversation_mark_as_read($msgId, $userId = null);
+
+conversation_mark_as_read_all($convId, $userId = null);
+conversation_mark_as_unread_all($convId, $userId = null);
+```
+
 
 # Credits
 
