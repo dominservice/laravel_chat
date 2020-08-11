@@ -164,6 +164,11 @@ public function conversations($convId=null) {
         ->with('convs', $convs);
 }
 ```
+## Helpers
+Get all conversations for user
+```php
+get_conversations($userId = null);
+```
 
 # Credits
 
