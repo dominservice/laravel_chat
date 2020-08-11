@@ -29,7 +29,6 @@
             "Dominservice\\LaravelChat": "src/"
         },
         "classmap": [
-            "tests/TestCaseDb.php",
             "src/migrations/"
         ]
     },    
