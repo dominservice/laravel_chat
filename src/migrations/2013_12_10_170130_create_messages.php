@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMessages extends Migration {
 
@@ -11,7 +13,7 @@ class CreateMessages extends Migration {
 	 */
 	public function up()
 	{
-        Schema::create('messages', function($table)
+        Schema::create('messages', function(Blueprint $table)
         {
             $table->increments('id');
             $table->integer('sender_id');
