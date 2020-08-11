@@ -1,14 +1,15 @@
 <?php
 
-if (!function_exists('user_conversations')) {
+if (!function_exists('get_conversations')) {
     /**
      * @param $name
      * @param null $path
      * @param null $secure
      * @return mixed
      */
-    function user_conversations($userId = null)
+    function get_conversations($userId = null)
     {
+        $usersClass = config('laravel_chat.user_model');
         $userId = !$userId && \Auth::check() ? \Auth::user()->id : $userId;
         //get the conversations
         $convs = (new Dominservice\LaravelChat\LaravelChat)->getUserConversations($userId);
@@ -22,6 +23,11 @@ if (!function_exists('user_conversations')) {
         //making sure each user appears once
         $participants = array_unique($participants);
 
-        return ['conversations'=>$convs, 'participants'=>$participants];
+        $users = [];
+        if (!empty($participants)) {
+            $users = $usersClass()->whereIn($participants)->get();
+        }
+
+        return ['conversations'=>$convs, 'users'=>$users];
     }
 }

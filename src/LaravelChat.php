@@ -30,7 +30,6 @@ class LaravelChat {
     const ARCHIVED = 3;
     protected $usersTable;
     protected $usersTableKey;
-    protected $tablePrefix;
     /**
      * @var Repositories\Contracts\iLaravelChatRepository
      */

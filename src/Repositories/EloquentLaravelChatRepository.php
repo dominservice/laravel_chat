@@ -19,16 +19,14 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
 {
     protected $usersTable;
     protected $usersTableKey;
-    protected $tablePrefix;
     /**
      * @var DatabaseManager
      */
     private $db;
 
-    public function __construct($tablePrefix, $usersTable, $usersTableKey, DatabaseManager $db) {
+    public function __construct($usersTable, $usersTableKey, DatabaseManager $db) {
         $this->usersTable = $usersTable;
         $this->usersTableKey = $usersTableKey;
-        $this->tablePrefix = $tablePrefix;
         $this->db = $db;
     }
 
@@ -52,7 +50,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     }
 
     protected function addConvUserRow($conv_id, $user_id) {
-        $this->db->table($this->tablePrefix.'conversation_users')->insert(
+        $this->db->table('conversation_users')->insert(
             array('conversation_id' => $conv_id, 'user_id' => $user_id)
         );
     }
@@ -100,11 +98,11 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function getConversationByTwoUsers($userA_id, $userB_id) {
         $results = $this->db->select(
             '
-            SELECT cu.conversation_id
-            FROM conversation_users cu
-            WHERE cu.user_id=? OR cu.user_id=?
-            GROUP BY cu.conversation_id
-            HAVING COUNT(cu.conversation_id)=2
+            SELECT `cu`.`conversation_id`
+            FROM `conversation_users` `cu`
+            WHERE `cu`.`user_id`=? OR `cu`.`user_id`=?
+            GROUP BY `cu`.`conversation_id`
+            HAVING COUNT(`cu`.`conversation_id`)=2
             '
             , [$userA_id, $userB_id]);
         if( count($results) == 1 ) {
@@ -116,10 +114,10 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function markMessageAs($msgId, $userId, $status) {
         $this->db->statement(
             '
-            UPDATE '.$this->tablePrefix.'message_statuses
-            SET status=?
-            WHERE user_id=?
-            AND message_id=?
+            UPDATE `message_statuses`
+            SET `status`=?
+            WHERE `user_id`=?
+            AND `message_id`=?
             ',
             [$status, $userId, $msgId]
         );
@@ -140,7 +138,7 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
 
     public function isUserInConversation($conv_id, $user_id) {
         $res = $this->db
-            ->table($this->tablePrefix.'conversation_users')
+            ->table('conversation_users')
             ->select('conversation_id', 'user_id')
             ->where('user_id', $user_id)
             ->where('conversation_id', $conv_id)
@@ -154,9 +152,9 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function getUsersInConversation($conv_id) {
         $results = $this->db->select(
             '
-            SELECT cu.user_id
-            FROM '.$this->tablePrefix.'conversation_users cu
-            WHERE cu.conversation_id=?
+            SELECT `cu`.`user_id`
+            FROM `conversation_users` `cu`
+            WHERE `cu`.`conversation_id`=?
             ',
             [$conv_id]
         );
@@ -171,10 +169,10 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function getNumOfUnreadMsgs($user_id) {
         $results = $this->db->select(
             '
-            SELECT COUNT(mst.id) as "numOfUnread"
-            FROM '.$this->tablePrefix.'message_statuses mst
-            WHERE mst.user_id=?
-            AND mst.status=?
+            SELECT COUNT(`mst`.`id`) as `numOfUnread`
+            FROM `message_statuses` `mst`
+            WHERE `mst`.`user_id`=?
+            AND `mst`.`status`=?
             ',
             [$user_id, self::UNREAD]
         );
@@ -184,19 +182,17 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     public function markReadAllMessagesInConversation($conv_id, $user_id)
     {
 
-        $this->db->statement(
-            '
-        UPDATE ' . $this->tablePrefix . 'message_statuses
-        SET status=?
-        WHERE user_id=?
-        AND status=?
-        AND message_id IN (
-          SELECT id
-          FROM messages
-          WHERE conversation_id=?
-          AND sender_id!=?
-        )
-        ',
+        $this->db->statement('
+            UPDATE `message_statuses`
+            SET `status`=?
+            WHERE `user_id`=?
+            AND `status`=?
+            AND `message_id` IN (
+              SELECT `id`
+              FROM `messages`
+              WHERE `conversation_id`=?
+              AND `sender_id`!=?
+            )',
             [self::READ, $user_id, self::UNREAD, $conv_id, $user_id]
         );
 
@@ -204,17 +200,15 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
     }
 
     public function deleteConversation($conv_id, $user_id) {
-        $this->db->statement(
-            '
-            UPDATE '.$this->tablePrefix.'message_statuses mst
-            SET mst.status='.self::DELETED.'
-            WHERE mst.user_id=?
-            AND mst.message_id IN (
-              SELECT msg.id
-              FROM messages msg
-              WHERE msg.conversation_id=?
-            )
-            ',
+        $this->db->statement('
+            UPDATE `message_statuses` mst
+            SET `mst`.`status`='.self::DELETED.'
+            WHERE `mst`.`user_id`=?
+            AND `mst`.`message_id` IN (
+              SELECT `msg`.`id`
+              FROM `messages` `msg`
+              WHERE `msg`.`conversation_id`=?
+            )',
             [$user_id, $conv_id]
         );
     }
@@ -226,49 +220,45 @@ class EloquentLaravelChatRepository implements iLaravelChatRepository
         else
             $orderBy = 'asc';
 
-        return $this->db->select(
-            '
-            SELECT msg.id as "msgId", msg.content, mst.status, msg.created_at, msg.sender_id as "userId"
-            FROM '.$this->tablePrefix.'message_statuses mst
-            INNER JOIN '.$this->tablePrefix.'messages msg
-            ON mst.message_id=msg.id
-            WHERE msg.conversation_id=?
-            AND mst.user_id = ?
-            AND mst.status NOT IN (?,?)
-            ORDER BY msg.created_at '.$orderBy.'
+        return $this->db->select('
+            SELECT `msg`.`id` as `msgId`, `msg`.`content`, `mst`.`status`, `msg`.`created_at`, `msg`.`sender_id` as `userId`
+            FROM `message_statuses` `mst`
+            INNER JOIN `messages` `msg`
+            ON `mst`.`message_id`=`msg`.`id`
+            WHERE `msg`.`conversation_id`=?
+            AND `mst`.`user_id` = ?
+            AND `mst`.`status` NOT IN (?,?)
+            ORDER BY `msg`.`created_at` '.$orderBy.'
             '
             , [$conv_id, $user_id, self::DELETED, self::ARCHIVED]);
     }
 
     public function getConversations($user_id)
     {
-        return $this->db->select(
-            '
-            SELECT msg.conversation_id as conversation_id, msg.created_at, msg.id "msgId", msg.content, mst.status, mst.self, us.'.$this->usersTableKey.' "userId"
-            FROM '.$this->tablePrefix.'messages msg
+        return $this->db->select("
+            SELECT `msg`.`conversation_id` as `conversation_id`, `msg`.`created_at`, `msg`.`id` as `msgId`, `msg`.`content`, `mst`.`status`, `mst`.`self`, `us`.`{$this->usersTableKey}` as `userId`
+            FROM `messages` `msg`
             INNER JOIN (
-                SELECT MAX(created_at) created_at
-                FROM '.$this->tablePrefix.'messages
-                GROUP BY conversation_id
-            ) m2 ON msg.created_at = m2.created_at
-            INNER JOIN '.$this->tablePrefix.'message_statuses mst ON msg.id=mst.message_id
-            INNER JOIN '.$this->usersTable.' us ON msg.sender_id=us.'.$this->usersTableKey.'
-            WHERE mst.user_id = ? AND mst.status NOT IN (?, ?)
-            ORDER BY msg.created_at DESC
-            '
+                SELECT MAX(`created_at`) `created_at`
+                FROM `messages`
+                GROUP BY `conversation_id`
+            ) `m2` ON `msg`.`created_at` = `m2`.`created_at`
+            INNER JOIN `message_statuses` `mst` ON `msg`.`id`=`mst`.`message_id`
+            INNER JOIN `$this->usersTable` `us` ON `msg`.`sender_id`=`us`.`{$this->usersTableKey}`
+            WHERE `mst`.`user_id` = ? AND `mst`.`status` NOT IN (?, ?)
+            ORDER BY `msg`.`created_at` DESC
+            "
             , [$user_id, self::DELETED, self::ARCHIVED]);
     }
 
     public function getUsersInConvs($convsIds)
     {
-        return $this->db->select(
-            '
-                SELECT cu.conversation_id, us.'.$this->usersTableKey.'
-                FROM '.$this->tablePrefix.'conversation_users cu
-                INNER JOIN '.$this->usersTable.' us
-                ON cu.user_id=us.'.$this->usersTableKey.'
-                WHERE cu.conversation_id IN('.$convsIds.')
-            '
+        return $this->db->select("SELECT `cu`.`conversation_id`, `us`.`{$this->usersTableKey}`
+                FROM `conversation_users` `cu`
+                INNER JOIN `{$this->usersTable}` `us`
+                ON `cu`.`user_id`=`us`.`{$this->usersTableKey}`
+                WHERE `cu`.`conversation_id` IN(`{$convsIds}`)
+            "
             , []);
     }
 }
