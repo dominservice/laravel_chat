@@ -2,10 +2,8 @@
 
 if (!function_exists('get_conversations')) {
     /**
-     * @param $name
-     * @param null $path
-     * @param null $secure
-     * @return mixed
+     * @param null $userId
+     * @return array
      */
     function get_conversations($userId = null)
     {

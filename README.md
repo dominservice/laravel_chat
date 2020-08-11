@@ -51,149 +51,118 @@ php artisan migrate
 #### Get User Conversations:
 
 ```php
-        $convs = LaravelChat::getUserConversations($user_id);
+$convs = LaravelChat::getUserConversations($user_id);
 ```
 This will return you a "Illuminate\Support\Collection" of "Dominservice\LaravelChat\Entities\Conversation" objects.
 And foreach Conversation there, you will have the last message of the conversation, and the participants of the conversation.
 Example:
 ```php
-        foreach ( $convs as $conv ) {
-        
-            $getNumOfParticipants = $conv->getNumOfParticipants();
-            $participants = $conv->getAllParticipants();
+foreach ( $convs as $conv ) {
+    $getNumOfParticipants = $conv->getNumOfParticipants();
+    $participants = $conv->getAllParticipants();
             
-            /* $lastMessage Dominservice\LaravelChat\Entities\Message */
-            $lastMessage = $conv->getLastMessage();
+    /* $lastMessage Dominservice\LaravelChat\Entities\Message */
+    $lastMessage = $conv->getLastMessage();
             
-            $senderId = $lastMessage->getSender();
-            $content = $lastMessage->getContent();
-            $status = $lastMessage->getStatus();
-        }
+    $senderId = $lastMessage->getSender();
+    $content = $lastMessage->getContent();
+    $status = $lastMessage->getStatus();
+}
 ```
 
 #### Get User specific conversation:
 
 ```php
-        $conv = LaravelChat::getConversationMessages($conv_id, $user_id);
+$conv = LaravelChat::getConversationMessages($conv_id, $user_id);
 ```
 This will return you a "Dominservice\LaravelChat\Entities\Conversation" object.
 On the object you could get all messages, all participants, conv_id, and more, simply browse the object itself.
 Example:
 ```php
-        foreach ( $conv->getAllMessages() as $msg ) {
-            $senderId = $msg->getSender();
-            $content = $msg->getContent();
-            $status = $msg->getStatus();
-        }
+foreach ( $conv->getAllMessages() as $msg ) {
+    $senderId = $msg->getSender();
+    $content = $msg->getContent();
+    $status = $msg->getStatus();
+}
 ```
-
-
-
-
 #### Get the conversation id of a conversation between two users:
 
 ```php
-        $conv = LaravelChat::getConversationByTwoUsers($userA_id, $userB_id);
+$conv = LaravelChat::getConversationByTwoUsers($userA_id, $userB_id);
 ```
 Simply gives you an id of the conversation between two users, this was created for redirecting to the conversation page when user tries to send a message to another user, so if there is no id returned that means that those users has no conversation yet, so we could create one.
-
-
-
-
 #### Add a new message to conversation:
 
 ```php
-        $conv = LaravelChat::addMessageToConversation($conv_id, $user_id, $content);
+$conv = LaravelChat::addMessageToConversation($conv_id, $user_id, $content);
 ```
 Simply add a message to an exiting conversation, content is the message text.
-
-
-
 #### Create a new conversation:
 
 ```php
-        $conv = LaravelChat::createConversation($users_ids=array());
+$conv = LaravelChat::createConversation($users_ids=array());
 ```
 Creates a new conversation with the users id's you passed in the array.
-
-
-
-
 
 #### Get all users in conversation:
 
 ```php
-        $conv = LaravelChat::getUsersInConversation($conv_id);
+$conv = LaravelChat::getUsersInConversation($conv_id);
 ```
 returns an array of user id in the conversation.
-
-
-
 
 #### Delete conversation:
 
 ```php
-        $conv = LaravelChat::deleteConversation($conv_id, $user_id);
+$conv = LaravelChat::deleteConversation($conv_id, $user_id);
 ```
 "Deletes" the conversation from a specifc user view.
-
-
-
 #### Check if user is in conversation:
 
 ```php
-        $conv = LaravelChat::isUserInConversation($conv_id, $user_id);
+$conv = LaravelChat::isUserInConversation($conv_id, $user_id);
 ```
 True or False if user is in conversation.
-
-
-
 
 #### Get number of unread messages for specific user:
 
 ```php
-        $conv = LaravelChat::getNumOfUnreadMsgs($user_id);
+$conv = LaravelChat::getNumOfUnreadMsgs($user_id);
 ```
 return an integer of number of unread messages for specific user.
-
-
-
-
 
 #### Mark all messages as "read" for specifc user in conversation:
 
 ```php
-        $conv = LaravelChat::markReadAllMessagesInConversation($conv_id, $user_id);
+$conv = LaravelChat::markReadAllMessagesInConversation($conv_id, $user_id);
 ```
 
 ### Example
 ```php
-        public function conversations($convId=null) {
-            $currentUser = Auth::user();
-            //get the conversations
-            $convs = LaravelChat::getUserConversations( $currentUser->id );
-            //array for storing our users data, as that LaravelChat only provides user id's
-            $participants = [];
+public function conversations($convId=null) {
+    $currentUser = Auth::user();
+    //get the conversations
+    $convs = LaravelChat::getUserConversations( $currentUser->id );
+    //array for storing our users data, as that LaravelChat only provides user id's
+    $participants = [];
     
-            //gathering participants
-            foreach ( $convs as $conv ) {
-                $participants = array_merge($participants, $conv->getAllParticipants());
-            }
-            //making sure each user appears once
-            $participants = array_unique($participants);
+    //gathering participants
+    foreach ( $convs as $conv ) {
+        $participants = array_merge($participants, $conv->getAllParticipants());
+    }
+    //making sure each user appears once
+    $participants = array_unique($participants);
     
-            //getting all data of participants
-            $viewUsers = [];
-            if ( !empty($participants) ) {
-                $users = User::whereIn('id', $participants)->with('profileImage')->getDictionary();
-                
-            }
+    //getting all data of participants
+    if ( !empty($participants) ) {
+        $users = User::whereIn('id', $participants)->with('profileImage')->getDictionary();
+    }
             
-            return View::make('conversations_page')
-                ->with('users', $users)
-                ->with('user', $currentUser)
-                ->with('convs', $convs);
-        }
+    return View::make('conversations_page')
+        ->with('users', $users)
+        ->with('user', $currentUser)
+        ->with('convs', $convs);
+}
 ```
 
 # Credits
