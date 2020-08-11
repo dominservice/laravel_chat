@@ -7,8 +7,8 @@ require __DIR__.'/TestDispatcher.php';
 class TestCaseDb extends \PHPUnit_Framework_TestCase {
 
 	protected $db;
-	/** @var \Tzookb\TBMsg\TBMsg */
-	protected $tbmsg;
+	/** @var \Dominservice\LaravelChat\LaravelChat */
+	protected $laravel_chat;
 
 	public function setUp() {
 		parent::setUp(); // Don't forget this!
@@ -81,36 +81,36 @@ class TestCaseDb extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function initTbmsg() {
-        $this->tbmsg = new \Tzookb\TBMsg\TBMsg(
-            new \Tzookb\TBMsg\Repositories\EloquentTBMsgRepository('', 'users', 'id', $this->db),
+        $this->laravel_chat = new \Dominservice\LaravelChat\LaravelChat(
+            new \Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository('', 'users', 'id', $this->db),
             new TestDispatcher());
 	}
 
 	protected function initMuffing() {
-		League\FactoryMuffin\Facade::define('Tzookb\TBMsg\Models\Eloquent\Conversation', array(
+		League\FactoryMuffin\Facade::define('Dominservice\LaravelChat\Models\Eloquent\Conversation', array(
 			//'id' => 'int',
 			'deleted_at' => 'dateTime',
 			'created_at' => 'dateTime',
 			'updated_at' => 'dateTime',
 		));
 
-		League\FactoryMuffin\Facade::define('Tzookb\TBMsg\Models\Eloquent\ConversationUsers', array(
-			'conv_id' => 'factory|Tzookb\TBMsg\Models\Eloquent\Conversation',
+		League\FactoryMuffin\Facade::define('Dominservice\LaravelChat\Models\Eloquent\ConversationUsers', array(
+			'conv_id' => 'factory|Dominservice\LaravelChat\Models\Eloquent\Conversation',
 			'user_id' => 'int'
 		));
 
-		League\FactoryMuffin\Facade::define('Tzookb\TBMsg\Models\Eloquent\Message', array(
+		League\FactoryMuffin\Facade::define('Dominservice\LaravelChat\Models\Eloquent\Message', array(
 			'sender_id' => 'int',
-			'conv_id' => 'factory|Tzookb\TBMsg\Models\Eloquent\Conversation',
+			'conv_id' => 'factory|Dominservice\LaravelChat\Models\Eloquent\Conversation',
 			'content' => 'int',
 			'created_at' => 'int',
 			'updated_at' => 'int',
 		));
 
 
-		League\FactoryMuffin\Facade::define('Tzookb\TBMsg\Models\Eloquent\MessageStatus', array(
+		League\FactoryMuffin\Facade::define('Dominservice\LaravelChat\Models\Eloquent\MessageStatus', array(
 			'user_id' => 'int',
-			'msg_id' => 'factory|Tzookb\TBMsg\Models\Eloquent\Message',
+			'msg_id' => 'factory|Dominservice\LaravelChat\Models\Eloquent\Message',
 			'self' => 'int',
 			'status' => 'int',
 		));

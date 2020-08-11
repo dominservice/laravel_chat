@@ -6,20 +6,20 @@
  * Time: 10:58 AM
  */
 
-namespace Tzookb\TBMsg\Repositories;
+namespace Dominservice\LaravelChat\Repositories;
 
 
 use Illuminate\Database\DatabaseManager;
-use Tzookb\TBMsg\Exceptions\ConversationNotFoundException;
-use Tzookb\TBMsg\Exceptions\NotEnoughUsersInConvException;
-use Tzookb\TBMsg\Exceptions\UserNotInConvException;
-use Tzookb\TBMsg\Models\Eloquent\ConversationUsers;
-use Tzookb\TBMsg\Models\Eloquent\MessageStatus;
-use Tzookb\TBMsg\Repositories\Contracts\iTBMsgRepository;
-use Tzookb\TBMsg\Models\Eloquent\Message as MessageEloquent;
-use Tzookb\TBMsg\Models\Eloquent\Conversation as ConversationEloquent;
+use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
+use Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException;
+use Dominservice\LaravelChat\Exceptions\UserNotInConvException;
+use Dominservice\LaravelChat\Models\Eloquent\ConversationUsers;
+use Dominservice\LaravelChat\Models\Eloquent\MessageStatus;
+use Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository;
+use Dominservice\LaravelChat\Models\Eloquent\Message as MessageEloquent;
+use Dominservice\LaravelChat\Models\Eloquent\Conversation as ConversationEloquent;
 
-class EloquentTBMsgRepository implements iTBMsgRepository
+class EloquentLaravelChatRepository implements iLaravelChatRepository
 {
     protected $usersTable;
     protected $usersTableKey;

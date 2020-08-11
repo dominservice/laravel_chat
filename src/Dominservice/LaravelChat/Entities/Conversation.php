@@ -6,7 +6,7 @@
  * Date: 6/11/14
  */
 
-namespace Tzookb\TBMsg\Entities;
+namespace Dominservice\LaravelChat\Entities;
 
 
 use Illuminate\Support\Collection;

@@ -1,5 +1,5 @@
 <?php
-namespace Tzookb\TBMsg\Models\Eloquent;
+namespace Dominservice\LaravelChat\Models\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -9,10 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * Time: 6:20 PM
  */
 
-class MessageStatus extends Model {
-
-    protected $table = 'messages_status';
-    public $timestamps = false;
+class Conversation  extends Model {
 
     public function __construct() {
 

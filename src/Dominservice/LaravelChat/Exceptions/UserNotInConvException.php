@@ -6,6 +6,6 @@
  * Time: 10:32 AM
  */
 
-namespace Tzookb\TBMsg\Exceptions;
+namespace Dominservice\LaravelChat\Exceptions;
 
 class UserNotInConvException extends \Exception {}

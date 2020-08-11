@@ -1,5 +1,5 @@
 {
-    "name": "tzookb/tbmsg",
+    "name": "dominservice/laravel_chat",
     "type": "library",
     "description": "users messaging system",
     "keywords": ["laravel", "php", "messaging", "message-system", "chat", "laravel-messenger"],

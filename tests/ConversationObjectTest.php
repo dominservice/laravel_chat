@@ -1,8 +1,8 @@
 <?php
 
 
-use Tzookb\TBMsg\Entities\Conversation;
-use Tzookb\TBMsg\Entities\Message;
+use Dominservice\LaravelChat\Entities\Conversation;
+use Dominservice\LaravelChat\Entities\Message;
 
 class ConversationObjectTest extends TestCaseDb  {
 

@@ -1,8 +1,8 @@
 <?php
 
 
-use Tzookb\TBMsg\Entities\Message;
-use Tzookb\TBMsg\TBMsg;
+use Dominservice\LaravelChat\Entities\Message;
+use Dominservice\LaravelChat\LaravelChat;
 
 class EndToEndTest extends TestCaseDb  {
 
@@ -14,26 +14,26 @@ class EndToEndTest extends TestCaseDb  {
 		$user2 = 9;
 		$content = 'default content';
 
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, $content);
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, $content);
 
-		$conv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$conv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 		$message = $conv->getLastMessage();
-		$this->assertEquals(TBMsg::UNREAD, $message->getStatus());
+		$this->assertEquals(LaravelChat::UNREAD, $message->getStatus());
 
-		$this->tbmsg->markMessageAsRead($message->getId(), $user2);
+		$this->laravel_chat->markMessageAsRead($message->getId(), $user2);
 
-		$conv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$conv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 		$message = $conv->getLastMessage();
-		$this->assertEquals(TBMsg::READ, $message->getStatus());
+		$this->assertEquals(LaravelChat::READ, $message->getStatus());
 
-		$this->tbmsg->markMessageAsUnread($message->getId(), $user2);
+		$this->laravel_chat->markMessageAsUnread($message->getId(), $user2);
 
-		$conv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$conv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 		$message = $conv->getLastMessage();
-		$this->assertEquals(TBMsg::UNREAD, $message->getStatus());
+		$this->assertEquals(LaravelChat::UNREAD, $message->getStatus());
 	}
 
 	/**
@@ -44,15 +44,15 @@ class EndToEndTest extends TestCaseDb  {
 		$user2 = 9;
 		$content = 'default content';
 
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, $content);
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, $content);
-		$this->assertEquals(2, $this->tbmsg->getNumOfUnreadMsgs($user2));
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, $content);
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, $content);
+		$this->assertEquals(2, $this->laravel_chat->getNumOfUnreadMsgs($user2));
 
-		$this->tbmsg->markReadAllMessagesInConversation($createdConvId, $user2);
-		$this->assertEquals(0, $this->tbmsg->getNumOfUnreadMsgs($user2));
+		$this->laravel_chat->markReadAllMessagesInConversation($createdConvId, $user2);
+		$this->assertEquals(0, $this->laravel_chat->getNumOfUnreadMsgs($user2));
 	}
 
 	/**
@@ -63,16 +63,16 @@ class EndToEndTest extends TestCaseDb  {
 		$user2 = 9;
 		$content = 'default content';
 
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$this->assertEquals(0, $this->tbmsg->getNumOfUnreadMsgs($user2));
+		$this->assertEquals(0, $this->laravel_chat->getNumOfUnreadMsgs($user2));
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, $content);
-		$this->assertEquals(1, $this->tbmsg->getNumOfUnreadMsgs($user2));
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, $content);
+		$this->assertEquals(1, $this->laravel_chat->getNumOfUnreadMsgs($user2));
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, $content);
-		$this->assertEquals(2, $this->tbmsg->getNumOfUnreadMsgs($user2));
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, $content);
+		$this->assertEquals(2, $this->laravel_chat->getNumOfUnreadMsgs($user2));
 	}
 
 	/**
@@ -93,13 +93,13 @@ class EndToEndTest extends TestCaseDb  {
 
 		$dispatcher->shouldReceive('fire')->with('message.sent', [$arr]);
 
-		$this->tbmsg = new \Tzookb\TBMsg\TBMsg(
-			new \Tzookb\TBMsg\Repositories\EloquentTBMsgRepository('', 'users', 'id', $this->db),
+		$this->laravel_chat = new \Dominservice\LaravelChat\LaravelChat(
+			new \Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository('', 'users', 'id', $this->db),
 			$dispatcher);
 
-		$this->tbmsg->sendMessageBetweenTwoUsers($user1, $user2, $content);
+		$this->laravel_chat->sendMessageBetweenTwoUsers($user1, $user2, $content);
 
-		$data = $this->tbmsg->getConversationByTwoUsers($user1, $user2);
+		$data = $this->laravel_chat->getConversationByTwoUsers($user1, $user2);
 		$this->assertEquals(1, $data);
 	}
 
@@ -112,17 +112,17 @@ class EndToEndTest extends TestCaseDb  {
 		$user3 = 11;
 		$user4 = 15;
 		$user5 = 17;
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$fullConv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$fullConv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 		$this->assertEquals(2, $fullConv->getNumOfParticipants());
 
 		//check 5 users
-		$data = $this->tbmsg->createConversation([$user1, $user2, $user3, $user4, $user5]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2, $user3, $user4, $user5]);
 		$createdConvId = $data['convId'];
 
-		$fullConv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$fullConv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 		$this->assertEquals(5, $fullConv->getNumOfParticipants());
 	}
 
@@ -133,17 +133,17 @@ class EndToEndTest extends TestCaseDb  {
 		$user1 = 4;
 		$user2 = 9;
 
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
 
 
 		$this->assertTrue(
-			$this->tbmsg->isUserInConversation($createdConvId, $user1)
+			$this->laravel_chat->isUserInConversation($createdConvId, $user1)
 		);
 
 		$this->assertTrue(
-			$this->tbmsg->isUserInConversation($createdConvId, $user2)
+			$this->laravel_chat->isUserInConversation($createdConvId, $user2)
 		);
 	}
 
@@ -155,13 +155,13 @@ class EndToEndTest extends TestCaseDb  {
 		$user2 = 9;
 		$user3 = 11;
 
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
 
 
 		$this->assertFalse(
-			$this->tbmsg->isUserInConversation($createdConvId, $user3)
+			$this->laravel_chat->isUserInConversation($createdConvId, $user3)
 		);
 
 
@@ -173,12 +173,12 @@ class EndToEndTest extends TestCaseDb  {
 	public function get_conversation_users() {
 		$user1 = 4;
 		$user2 = 9;
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, 'message content');
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, 'message content');
 
-		$fullConv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$fullConv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 
 		$participants = $fullConv->getAllParticipants();
 		$participants = array_flip($participants);
@@ -193,12 +193,12 @@ class EndToEndTest extends TestCaseDb  {
 	public function check_conversation_type_is_couple() {
 		$user1 = 4;
 		$user2 = 9;
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, 'message content');
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, 'message content');
 
-		$fullConv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$fullConv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 
 		$this->assertEquals('couple', $fullConv->getType());
 	}
@@ -229,16 +229,16 @@ class EndToEndTest extends TestCaseDb  {
 
 
 
-		$this->tbmsg = new \Tzookb\TBMsg\TBMsg(
-			new \Tzookb\TBMsg\Repositories\EloquentTBMsgRepository('', 'users', 'id', $this->db),
+		$this->laravel_chat = new \Dominservice\LaravelChat\LaravelChat(
+			new \Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository('', 'users', 'id', $this->db),
 			$dispatcher);
 
-		$data = $this->tbmsg->createConversation([$user1, $user2]);
+		$data = $this->laravel_chat->createConversation([$user1, $user2]);
 		$createdConvId = $data['convId'];
 
-		$this->tbmsg->addMessageToConversation($createdConvId, $user1, $msgContent);
+		$this->laravel_chat->addMessageToConversation($createdConvId, $user1, $msgContent);
 
-		$conv = $this->tbmsg->getConversationMessages($createdConvId, $user2);
+		$conv = $this->laravel_chat->getConversationMessages($createdConvId, $user2);
 
 		$this->assertEquals(1, $conv->getNumOfMessages());
 
@@ -248,7 +248,7 @@ class EndToEndTest extends TestCaseDb  {
 		$this->assertEquals($msgContent, $msg->getContent());
 		$this->assertEquals($user1, $msg->getSender());
 		$this->assertEquals(0, $msg->getSelf());
-		$this->assertEquals(TBMsg::UNREAD, $msg->getStatus());
+		$this->assertEquals(LaravelChat::UNREAD, $msg->getStatus());
 	}
 
 	/**
@@ -256,20 +256,20 @@ class EndToEndTest extends TestCaseDb  {
 	 */
 	public function get_conversation_by_2_users() {
 
-		$data = $this->tbmsg->createConversation([1,5]);
+		$data = $this->laravel_chat->createConversation([1,5]);
 		$createdConvId = $data['convId'];
 
-		$foundConvId = $this->tbmsg->getConversationByTwoUsers(1,5);
+		$foundConvId = $this->laravel_chat->getConversationByTwoUsers(1,5);
 
 		$this->assertEquals($createdConvId, $foundConvId);
 	}
 
 	/**
 	 * @test
-	 * @expectedException     Tzookb\TBMsg\Exceptions\NotEnoughUsersInConvException
+	 * @expectedException     Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException
 	 */
 	public function create_conversation_with_not_enough_users() {
-		$data = $this->tbmsg->createConversation([1]);
+		$data = $this->laravel_chat->createConversation([1]);
 	}
 
 	public function todo() {

@@ -1,5 +1,5 @@
 <?php
-namespace Tzookb\TBMsg\Models\Eloquent;
+namespace Dominservice\LaravelChat\Models\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
 /**

@@ -6,7 +6,7 @@
  * Time: 8:30 PM
  */
 
-namespace Tzookb\TBMsg\Exceptions;
+namespace Dominservice\LaravelChat\Exceptions;
 
 
 class ConversationNotFoundException extends \Exception {

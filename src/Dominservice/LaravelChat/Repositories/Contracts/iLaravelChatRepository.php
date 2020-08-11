@@ -6,10 +6,10 @@
  * Time: 10:57 AM
  */
 
-namespace Tzookb\TBMsg\Repositories\Contracts;
+namespace Dominservice\LaravelChat\Repositories\Contracts;
 
 
-interface iTBMsgRepository {
+interface iLaravelChatRepository {
 
     const DELETED = 0;
     const UNREAD = 1;

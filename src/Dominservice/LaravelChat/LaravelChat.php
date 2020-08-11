@@ -1,25 +1,25 @@
 <?php
-namespace Tzookb\TBMsg;
+namespace Dominservice\LaravelChat;
 
 
 use DB;
 use Config;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
-use Tzookb\TBMsg\Exceptions\ConversationNotFoundException;
-use Tzookb\TBMsg\Exceptions\NotEnoughUsersInConvException;
-use Tzookb\TBMsg\Exceptions\UserNotInConvException;
+use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
+use Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException;
+use Dominservice\LaravelChat\Exceptions\UserNotInConvException;
 
-use Tzookb\TBMsg\Entities\Conversation;
-use Tzookb\TBMsg\Entities\Message;
+use Dominservice\LaravelChat\Entities\Conversation;
+use Dominservice\LaravelChat\Entities\Message;
 
-use Tzookb\TBMsg\Models\Eloquent\Message as MessageEloquent;
-use Tzookb\TBMsg\Models\Eloquent\Conversation as ConversationEloquent;
-use Tzookb\TBMsg\Models\Eloquent\ConversationUsers;
-use Tzookb\TBMsg\Models\Eloquent\MessageStatus;
-use Tzookb\TBMsg\Repositories\Contracts\iTBMsgRepository;
+use Dominservice\LaravelChat\Models\Eloquent\Message as MessageEloquent;
+use Dominservice\LaravelChat\Models\Eloquent\Conversation as ConversationEloquent;
+use Dominservice\LaravelChat\Models\Eloquent\ConversationUsers;
+use Dominservice\LaravelChat\Models\Eloquent\MessageStatus;
+use Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository;
 
-class TBMsg {
+class LaravelChat {
 
     const DELETED = 0;
     const UNREAD = 1;
@@ -29,20 +29,20 @@ class TBMsg {
     protected $usersTableKey;
     protected $tablePrefix;
     /**
-     * @var Repositories\Contracts\iTBMsgRepository
+     * @var Repositories\Contracts\iLaravelChatRepository
      */
-    protected $tbmRepo;
+    protected $dsolcRepo;
     /**
      * @var Dispatcher
      */
     protected $dispatcher;
 
     /**
-     * @param iTBMsgRepository $tbmRepo
+     * @param iLaravelChatRepository $dsolcRepo
      * @param Dispatcher $dispatcher
      */
-    public function __construct(iTBMsgRepository $tbmRepo, Dispatcher $dispatcher) {
-        $this->tbmRepo = $tbmRepo;
+    public function __construct(iLaravelChatRepository $dsolcRepo, Dispatcher $dispatcher) {
+        $this->dsolcRepo = $dsolcRepo;
         $this->dispatcher = $dispatcher;
     }
 
@@ -50,10 +50,10 @@ class TBMsg {
     /**
      * @param $msgId
      * @param $userId
-     * @param $status must be TBMsg consts: DELETED, UNREAD, READ, ARCHIVED
+     * @param $status must be LaravelChat consts: DELETED, UNREAD, READ, ARCHIVED
      */
     public function markMessageAs($msgId, $userId, $status) {
-        $this->tbmRepo->markMessageAs($msgId, $userId, $status);
+        $this->dsolcRepo->markMessageAs($msgId, $userId, $status);
     }
 
     /**
@@ -62,7 +62,7 @@ class TBMsg {
      * marks specific message as read
      */
     public function markMessageAsRead($msgId, $userId) {
-        $this->tbmRepo->markMessageAsRead($msgId, $userId);
+        $this->dsolcRepo->markMessageAsRead($msgId, $userId);
     }
 
     /**
@@ -71,7 +71,7 @@ class TBMsg {
      * marks specific message as unread
      */
     public function markMessageAsUnread($msgId, $userId) {
-        $this->tbmRepo->markMessageAsUnread($msgId, $userId);
+        $this->dsolcRepo->markMessageAsUnread($msgId, $userId);
     }
 
     /**
@@ -80,7 +80,7 @@ class TBMsg {
      * marks specific message as delete
      */
     public function markMessageAsDeleted($msgId, $userId) {
-        $this->tbmRepo->markMessageAsDeleted($msgId, $userId);
+        $this->dsolcRepo->markMessageAsDeleted($msgId, $userId);
     }
 
     /**
@@ -89,7 +89,7 @@ class TBMsg {
      * marks specific message as archived
      */
     public function markMessageAsArchived($msgId, $userId) {
-        $this->tbmRepo->markMessageAsArchived($msgId, $userId);
+        $this->dsolcRepo->markMessageAsArchived($msgId, $userId);
     }
 
     /**
@@ -100,7 +100,7 @@ class TBMsg {
         $return = [];
         $conversations = new Collection();
 
-        $convs = $this->tbmRepo->getConversations($user_id);
+        $convs = $this->dsolcRepo->getConversations($user_id);
 
         $convsIds = [];
         foreach ( $convs as $conv ) {
@@ -129,7 +129,7 @@ class TBMsg {
 
         if ( $convsIds != '' ) {
 
-            $usersInConvs = $this->tbmRepo->getUsersInConvs($convsIds);
+            $usersInConvs = $this->dsolcRepo->getUsersInConvs($convsIds);
 
             foreach ( $usersInConvs as $usersInConv ) {
                 if ( $user_id != $usersInConv->id ) {
@@ -156,7 +156,7 @@ class TBMsg {
      */
     public function getConversationMessages($conv_id, $user_id, $newToOld=true) {
 
-        $results = $this->tbmRepo->getConversationMessages($conv_id, $user_id, $newToOld);
+        $results = $this->dsolcRepo->getConversationMessages($conv_id, $user_id, $newToOld);
 
         $conversation = new Conversation();
         foreach ( $results as $row )
@@ -189,7 +189,7 @@ class TBMsg {
      */
     public function getConversationByTwoUsers($userA_id, $userB_id) {
         try {
-            $conv = $this->tbmRepo->getConversationByTwoUsers($userA_id, $userB_id);
+            $conv = $this->dsolcRepo->getConversationByTwoUsers($userA_id, $userB_id);
         } catch (ConversationNotFoundException $ex) {
             return -1;
         }
@@ -205,7 +205,7 @@ class TBMsg {
      * send message to conversation from specific user, and return the new message data
      */
     public function addMessageToConversation($conv_id, $user_id, $content) {
-        $eventData = $this->tbmRepo->addMessageToConversation($conv_id, $user_id, $content);
+        $eventData = $this->dsolcRepo->addMessageToConversation($conv_id, $user_id, $content);
 
         $this->dispatcher->fire('message.sent',[$eventData]);
         return  $eventData;
@@ -217,7 +217,7 @@ class TBMsg {
      * @return ConversationEloquent
      */
     public function createConversation( $users_ids ) {
-        $eventData = $this->tbmRepo->createConversation($users_ids);
+        $eventData = $this->dsolcRepo->createConversation($users_ids);
         $this->dispatcher->fire('conversation.created',[$eventData]);
         return $eventData;
     }
@@ -235,15 +235,15 @@ class TBMsg {
     {
         //get conversation by two users
         try {
-            $conv = $this->tbmRepo->getConversationByTwoUsers($senderId, $receiverId);
+            $conv = $this->dsolcRepo->getConversationByTwoUsers($senderId, $receiverId);
         } catch (ConversationNotFoundException $ex) {
             //if conversation doesnt exist, create it
-            $conv = $this->tbmRepo->createConversation([$senderId, $receiverId]);
+            $conv = $this->dsolcRepo->createConversation([$senderId, $receiverId]);
             $conv = $conv['convId'];
         }
 
         //add message to new conversation
-        $eventData = $this->tbmRepo->addMessageToConversation($conv, $senderId, $content);
+        $eventData = $this->dsolcRepo->addMessageToConversation($conv, $senderId, $content);
 
         $this->dispatcher->fire('message.sent',[$eventData]);
         return  $eventData;
@@ -256,7 +256,7 @@ class TBMsg {
      * mark all messages for specific user in specific conversation as read
      */
     public function markReadAllMessagesInConversation($conv_id, $user_id) {
-        $this->tbmRepo->markReadAllMessagesInConversation($conv_id, $user_id);
+        $this->dsolcRepo->markReadAllMessagesInConversation($conv_id, $user_id);
     }
 
     /**
@@ -284,7 +284,7 @@ class TBMsg {
     }
 
     public function deleteConversation($conv_id, $user_id) {
-        $this->tbmRepo->deleteConversation($conv_id, $user_id);
+        $this->dsolcRepo->deleteConversation($conv_id, $user_id);
     }
 
     /**
@@ -295,7 +295,7 @@ class TBMsg {
      * checks if specific user is in specific conversation
      */
     public function isUserInConversation($conv_id, $user_id) {
-        return $this->tbmRepo->isUserInConversation($conv_id, $user_id);
+        return $this->dsolcRepo->isUserInConversation($conv_id, $user_id);
     }
 
     /**
@@ -305,7 +305,7 @@ class TBMsg {
      * get an array of user id that participate in specific conversation
      */
     public function getUsersInConversation($conv_id) {
-        return $this->tbmRepo->getUsersInConversation($conv_id);
+        return $this->dsolcRepo->getUsersInConversation($conv_id);
     }
 
     /**
@@ -315,6 +315,6 @@ class TBMsg {
      * get number of unread messages for specific user
      */
     public function getNumOfUnreadMsgs($user_id) {
-        return $this->tbmRepo->getNumOfUnreadMsgs($user_id);
+        return $this->dsolcRepo->getNumOfUnreadMsgs($user_id);
     }
 }
