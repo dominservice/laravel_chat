@@ -2,7 +2,7 @@
     "name": "tzookb/tbmsg",
     "type": "library",
     "description": "users messaging system",
-    "keywords": ["laravel", "php", "messaging", "message-system", "chat", "laravel-messenger],
+    "keywords": ["laravel", "php", "messaging", "message-system", "chat", "laravel-messenger"],
     "homepage": "https://github.com/dominservice/laravel_chat",
     "license": "MIT",
     "authors": [
