@@ -15,9 +15,9 @@ class CreateMessageStatuses extends Migration {
 	{
         Schema::create('message_statuses', function(Blueprint $table)
         {
-            $table->increments('id');
-            $table->integer('user_id');
-            $table->integer('message_id');
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('message_id');
             $table->boolean('self');
             $table->integer('status');
 

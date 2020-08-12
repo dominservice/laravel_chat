@@ -1,7 +1,7 @@
 <?php namespace Dominservice\LaravelChat;
 
 use Illuminate\Support\ServiceProvider;
-use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
+//use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
 
 /**
  * Class LaravelChatServiceProvider
@@ -37,11 +37,11 @@ class LaravelChatServiceProvider extends ServiceProvider {
         $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
         $usersTableKey = \Config::get('laravel_chat.users_table_key', 'id');
 
-        $this->app->bind('Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository',
-            function($app) use($userModel, $usersTableKey) {
-                $db = $app->make('Illuminate\Database\DatabaseManager');
-                return new EloquentLaravelChatRepository($userModel, $usersTableKey, $db);
-            });
+//        $this->app->bind('Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository',
+//            function($app) use($userModel, $usersTableKey) {
+//                $db = $app->make('Illuminate\Database\DatabaseManager');
+//                return new EloquentLaravelChatRepository($userModel, $usersTableKey, $db);
+//            });
 
         // Register 'laravel_chat'
         $this->app['laravel_chat'] = $this->app->singleton('laravel_chat', function($app) {

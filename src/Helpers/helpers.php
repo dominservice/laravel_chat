@@ -5,19 +5,19 @@ if (!function_exists('get_conversations')) {
      * @param null $userId
      * @return array
      */
-    function get_conversations($userId = null)
+    function get_conversations($userId = null, $relationType = null, $relationId = null)
     {
-        $participants = [];
-        $users = [];
-        $usersClass = config('laravel_chat.user_model');
+        $users = collect([]);
         $userId = !$userId && \Auth::check() ? \Auth::user()->id : $userId;
-        $convs = (new Dominservice\LaravelChat\LaravelChat)->getUserConversations($userId);
+        $convs = (new Dominservice\LaravelChat\LaravelChat)->getConversations($userId, $relationType, $relationId);
         foreach ($convs as $conv) {
-            $participants = array_merge($participants, $conv->getAllParticipants());
-        }
-        $participants = array_unique($participants);
-        if (!empty($participants)) {
-            $users = $usersClass()->whereIn($participants)->get();
+            if ($conv->users) {
+                foreach($conv->users as $user) {
+                    if (empty($users[$user->id])) {
+                        $users[$user->id] = $user;
+                    }
+                }
+            }
         }
         return ['conversations'=>$convs, 'users'=>$users];
     }
@@ -29,10 +29,10 @@ if (!function_exists('set_conversation')) {
      * @return array|\Dominservice\LaravelChat\Models\Eloquent\Conversation
      * @throws \Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException
      */
-    function set_conversation($users = [])
+    function set_conversation($users = [], $relationType = null, $relationId = null)
     {
         if (!empty($users)) {
-            return (new Dominservice\LaravelChat\LaravelChat)->createConversation($users);
+            return (new Dominservice\LaravelChat\LaravelChat)->createConversation($users, $relationType, $relationId);
         }
         return [
             'convId' => null
@@ -92,20 +92,17 @@ if (!function_exists('conversation_add_message')) {
 
 if (!function_exists('conversation_add_message_between')) {
     /**
-     * @param $convId
      * @param $content
-     * @param null $userId
-     * @return array|null[]
+     * @param $receiverId
+     * @param null $senderId
+     * @param null $relationType
+     * @param null $relationId
+     * @return array
      */
-    function conversation_add_message_between($content, $receiverId, $senderId = null)
+    function conversation_add_message_between($content, $receiverId, $senderId = null, $relationType = null, $relationId = null)
     {
-        if (!empty($convId) && !empty($content)) {
-            $senderId = !$senderId && \Auth::check() ? \Auth::user()->id : $senderId;
-            return (new Dominservice\LaravelChat\LaravelChat)->sendMessageBetweenTwoUsers($senderId, $receiverId, $content);
-        }
-        return [
-            'convId' => null
-        ];
+        $senderId = !$senderId && \Auth::check() ? \Auth::user()->id : $senderId;
+        return (new Dominservice\LaravelChat\LaravelChat)->sendMessageBetweenTwoUsers($senderId, $receiverId, $content, $relationType, $relationId);
     }
 }
 
@@ -140,7 +137,7 @@ if (!function_exists('conversation_messages')) {
      * @param $convId
      * @param null $userId
      * @param bool $newToOld
-     * @return \Dominservice\LaravelChat\Entities\Conversation
+     * @return mixed
      */
     function conversation_messages($convId, $userId = null, $newToOld = true)
     {

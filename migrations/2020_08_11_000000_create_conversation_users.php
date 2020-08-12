@@ -15,8 +15,8 @@ class CreateConversationUsers extends Migration {
     {
         Schema::create('conversation_users', function(Blueprint $table)
         {
-            $table->integer('conversation_id')->nullable();
-            $table->integer('user_id')->nullable();
+            $table->unsignedBigInteger('conversation_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
 
 
             $table->primary(array('conversation_id', 'user_id'));

@@ -9,5 +9,12 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Conversation  extends Model
 {
-
-} 
+    public function users() {
+        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
+        return $this->belongsToMany($userModel,
+            'conversation_users',
+            'conversation_id',
+            'user_id'
+        );
+    }
+}

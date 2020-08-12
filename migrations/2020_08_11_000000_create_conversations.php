@@ -15,7 +15,9 @@ class CreateConversations extends Migration {
 	{
         Schema::create('conversations', function(Blueprint $table)
         {
-            $table->increments('id');
+            $table->unsignedBigInteger('parent_id');
+            $table->string('parent_type');
+            $table->id();
 
             $table->softDeletes();
             $table->timestamps();
