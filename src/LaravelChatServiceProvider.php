@@ -18,12 +18,12 @@ class LaravelChatServiceProvider extends ServiceProvider {
 
     public function boot() {
         $this->publishes([
-            __DIR__ . '/Config/laravel_chat.php' => config_path('laravel_chat.php'),
+            __DIR__ . '/../config/laravel_chat.php' => config_path('laravel_chat.php'),
         ], 'config');
 
         // Publish your migrations
         $this->publishes([
-            __DIR__ . '/Migrations/' => base_path('/database/migrations')
+            __DIR__ . '/../migrations/' => base_path('/database/migrations')
         ], 'migrations');
     }
 
@@ -34,13 +34,13 @@ class LaravelChatServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-        $usersTable = \Config::get('laravel_chat.users_table', 'users');
+        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
         $usersTableKey = \Config::get('laravel_chat.users_table_key', 'id');
 
         $this->app->bind('Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository',
-            function($app) use($usersTable, $usersTableKey) {
-				$db = $app->make('Illuminate\Database\DatabaseManager');
-                return new EloquentLaravelChatRepository($usersTable, $usersTableKey, $db);
+            function($app) use($userModel, $usersTableKey) {
+                $db = $app->make('Illuminate\Database\DatabaseManager');
+                return new EloquentLaravelChatRepository($userModel, $usersTableKey, $db);
             });
 
         // Register 'laravel_chat'

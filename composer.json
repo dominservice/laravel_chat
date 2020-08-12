@@ -32,7 +32,7 @@
             "src/Helpers/helpers.php"
         ],
         "classmap": [
-            "src/Migrations/"
+            "migrations/"
         ]
     },    
     "minimum-stability": "dev"    

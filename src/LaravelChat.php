@@ -3,7 +3,7 @@ namespace Dominservice\LaravelChat;
 
 use DB;
 use Config;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Collection;
 use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
 use Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException;
@@ -18,36 +18,31 @@ use Dominservice\LaravelChat\Models\Eloquent\ConversationUsers;
 use Dominservice\LaravelChat\Models\Eloquent\MessageStatus;
 use Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository;
 
+
+use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
+
 /**
  * Class LaravelChat
  * @package Dominservice\LaravelChat
  */
-class LaravelChat {
+class LaravelChat extends EloquentLaravelChatRepository{
 
     const DELETED = 0;
     const UNREAD = 1;
     const READ = 2;
     const ARCHIVED = 3;
-    protected $usersTable;
     protected $usersTableKey;
-    /**
-     * @var Repositories\Contracts\iLaravelChatRepository
-     */
-    protected $dsolcRepo;
-    /**
-     * @var Dispatcher
-     */
-    protected $dispatcher;
 
     /**
-     * @param iLaravelChatRepository $dsolcRepo
-     * @param Dispatcher $dispatcher
+     * LaravelChat constructor.
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function __construct(iLaravelChatRepository $dsolcRepo, Dispatcher $dispatcher) {
-        $this->dsolcRepo = $dsolcRepo;
-        $this->dispatcher = $dispatcher;
+    public function __construct() {
+        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
+        $usersTableKey = \Config::get('laravel_chat.users_table_key', 'id');
+        $db = app()->make('Illuminate\Database\DatabaseManager');
+        parent::__construct($userModel, $usersTableKey, $db);
     }
-
 
     /**
      * @param $msgId
@@ -55,7 +50,7 @@ class LaravelChat {
      * @param $status must be LaravelChat consts: DELETED, UNREAD, READ, ARCHIVED
      */
     public function markMessageAs($msgId, $userId, $status) {
-        $this->dsolcRepo->markMessageAs($msgId, $userId, $status);
+        $this->markMessageAs($msgId, $userId, $status);
     }
 
     /**
@@ -64,7 +59,7 @@ class LaravelChat {
      * marks specific message as read
      */
     public function markMessageAsRead($msgId, $userId) {
-        $this->dsolcRepo->markMessageAsRead($msgId, $userId);
+        $this->markMessageAsRead($msgId, $userId);
     }
 
     /**
@@ -73,7 +68,7 @@ class LaravelChat {
      * marks specific message as unread
      */
     public function markMessageAsUnread($msgId, $userId) {
-        $this->dsolcRepo->markMessageAsUnread($msgId, $userId);
+        $this->markMessageAsUnread($msgId, $userId);
     }
 
     /**
@@ -82,7 +77,7 @@ class LaravelChat {
      * marks specific message as delete
      */
     public function markMessageAsDeleted($msgId, $userId) {
-        $this->dsolcRepo->markMessageAsDeleted($msgId, $userId);
+        $this->markMessageAsDeleted($msgId, $userId);
     }
 
     /**
@@ -91,7 +86,7 @@ class LaravelChat {
      * marks specific message as archived
      */
     public function markMessageAsArchived($msgId, $userId) {
-        $this->dsolcRepo->markMessageAsArchived($msgId, $userId);
+        $this->markMessageAsArchived($msgId, $userId);
     }
 
     /**
@@ -102,7 +97,7 @@ class LaravelChat {
         $return = [];
         $conversations = new Collection();
 
-        $convs = $this->dsolcRepo->getConversations($user_id);
+        $convs = $this->getConversations($user_id);
 
         $convsIds = [];
         foreach ( $convs as $conv ) {
@@ -131,7 +126,7 @@ class LaravelChat {
 
         if ( $convsIds != '' ) {
 
-            $usersInConvs = $this->dsolcRepo->getUsersInConvs($convsIds);
+            $usersInConvs = $this->getUsersInConvs($convsIds);
 
             foreach ( $usersInConvs as $usersInConv ) {
                 if ( $user_id != $usersInConv->id ) {
@@ -158,7 +153,7 @@ class LaravelChat {
      */
     public function getConversationMessages($conv_id, $user_id, $newToOld=true) {
 
-        $results = $this->dsolcRepo->getConversationMessages($conv_id, $user_id, $newToOld);
+        $results = $this->getConversationMessages($conv_id, $user_id, $newToOld);
 
         $conversation = new Conversation();
         foreach ( $results as $row )
@@ -191,7 +186,7 @@ class LaravelChat {
      */
     public function getConversationByTwoUsers($userA_id, $userB_id) {
         try {
-            $conv = $this->dsolcRepo->getConversationByTwoUsers($userA_id, $userB_id);
+            $conv = $this->getConversationByTwoUsers($userA_id, $userB_id);
         } catch (ConversationNotFoundException $ex) {
             return -1;
         }
@@ -207,10 +202,7 @@ class LaravelChat {
      * send message to conversation from specific user, and return the new message data
      */
     public function addMessageToConversation($conv_id, $user_id, $content) {
-        $eventData = $this->dsolcRepo->addMessageToConversation($conv_id, $user_id, $content);
-
-        $this->dispatcher->fire('message.sent',[$eventData]);
-        return  $eventData;
+        return $this->addMessageToConversation($conv_id, $user_id, $content);
     }
 
     /**
@@ -219,9 +211,7 @@ class LaravelChat {
      * @return ConversationEloquent
      */
     public function createConversation( $users_ids ) {
-        $eventData = $this->dsolcRepo->createConversation($users_ids);
-        $this->dispatcher->fire('conversation.created',[$eventData]);
-        return $eventData;
+        return $this->createConversation($users_ids);
     }
 
     /**
@@ -237,18 +227,15 @@ class LaravelChat {
     {
         //get conversation by two users
         try {
-            $conv = $this->dsolcRepo->getConversationByTwoUsers($senderId, $receiverId);
+            $conv = $this->getConversationByTwoUsers($senderId, $receiverId);
         } catch (ConversationNotFoundException $ex) {
             //if conversation doesnt exist, create it
-            $conv = $this->dsolcRepo->createConversation([$senderId, $receiverId]);
+            $conv = $this->createConversation([$senderId, $receiverId]);
             $conv = $conv['convId'];
         }
 
         //add message to new conversation
-        $eventData = $this->dsolcRepo->addMessageToConversation($conv, $senderId, $content);
-
-        $this->dispatcher->fire('message.sent',[$eventData]);
-        return  $eventData;
+        return $this->addMessageToConversation($conv, $senderId, $content);
     }
 
     /**
@@ -258,7 +245,7 @@ class LaravelChat {
      * mark all messages for specific user in specific conversation as read
      */
     public function markReadAllMessagesInConversation($conv_id, $user_id) {
-        $this->dsolcRepo->markReadAllMessagesInConversation($conv_id, $user_id);
+        $this->markReadAllMessagesInConversation($conv_id, $user_id);
     }
 
     /**
@@ -268,25 +255,25 @@ class LaravelChat {
      * mark all messages for specific user in specific conversation as unread
      */
     public function markUnreadAllMessagesInConversation($conv_id, $user_id) {
-        DB::statement(
-            '
-            UPDATE message_statuses mst
-            SET mst.status=?
-            WHERE mst.user_id=?
-            AND mst.status=?
-            AND mst.message_id IN (
-              SELECT msg.id
-              FROM messages msg
-              WHERE msg.conversation_id=?
-              AND msg.sender_id!=?
+        $messageStatus = DB::getTablePrefix() . (new MessageStatus())->getTable();
+        DB::statement("
+            UPDATE `{$messageStatus}` `mst`
+            SET `mst`.`status`=?
+            WHERE `mst`.`user_id`=?
+            AND `mst`.`status`=?
+            AND `mst`.`message_id` IN (
+              SELECT `msg`.`id`
+              FROM `messages` `msg`
+              WHERE `msg`.`conversation_id`=?
+              AND `msg`.`sender_id`!=?
             )
-            ',
+            ",
             [self::UNREAD, $user_id, self::READ, $conv_id, $user_id]
         );
     }
 
     public function deleteConversation($conv_id, $user_id) {
-        $this->dsolcRepo->deleteConversation($conv_id, $user_id);
+        $this->deleteConversation($conv_id, $user_id);
     }
 
     /**
@@ -297,7 +284,7 @@ class LaravelChat {
      * checks if specific user is in specific conversation
      */
     public function isUserInConversation($conv_id, $user_id) {
-        return $this->dsolcRepo->isUserInConversation($conv_id, $user_id);
+        return $this->isUserInConversation($conv_id, $user_id);
     }
 
     /**
@@ -307,7 +294,7 @@ class LaravelChat {
      * get an array of user id that participate in specific conversation
      */
     public function getUsersInConversation($conv_id) {
-        return $this->dsolcRepo->getUsersInConversation($conv_id);
+        return $this->getUsersInConversation($conv_id);
     }
 
     /**
@@ -317,6 +304,6 @@ class LaravelChat {
      * get number of unread messages for specific user
      */
     public function getNumOfUnreadMsgs($user_id) {
-        return $this->dsolcRepo->getNumOfUnreadMsgs($user_id);
+        return $this->getNumOfUnreadMsgs($user_id);
     }
 }
