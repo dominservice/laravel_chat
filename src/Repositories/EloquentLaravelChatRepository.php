@@ -20,21 +20,15 @@ class EloquentLaravelChatRepository
     const UNREAD = 1;
     const READ = 2;
     const ARCHIVED = 3;
-
-    protected $usersTable;
-    protected $usersTableKey;
+    
     protected $messagesTable;
     protected $messagesStatusTable;
     protected $conversationUsersTable;
-    protected $conversationUsersTablePrefix;
 
-    public function __construct($userModel, $usersTableKey) {
-        $this->usersTableKey = $usersTableKey;
-        $this->usersTable = DB::getTablePrefix() . (new $userModel)->getTable();
+    public function __construct($userModel) {
         $this->messagesTable = DB::getTablePrefix() . (new MessageEloquent())->getTable();
         $this->messagesStatusTable = DB::getTablePrefix() . (new MessageStatus())->getTable();
         $this->conversationUsersTable = (new ConversationUsers())->getTable();
-        $this->conversationUsersTablePrefix = DB::getTablePrefix() . $this->conversationUsersTable;
     }
 
     public function createConversation($usersIds, $relationType = null, $relationId = null)

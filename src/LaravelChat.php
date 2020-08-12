@@ -26,9 +26,7 @@ class LaravelChat extends EloquentLaravelChatRepository{
      */
     public function __construct() {
         $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
-        $usersTableKey = \Config::get('laravel_chat.user_primary_key', 'id');
-        $db = app()->make('Illuminate\Database\DatabaseManager');
-        parent::__construct($userModel, $usersTableKey, $db);
+        parent::__construct($userModel);
     }
     
     /**
