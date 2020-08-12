@@ -1,4 +1,6 @@
 [![Latest Version](https://img.shields.io/github/release/dominservice/laravel_chat.svg?style=flat-square)](https://github.com/dominservice/laravel_chat/releases)
+[![Packagist Version](https://img.shields.io/packagist/v/dominservice/laravel_chat.svg?style=flat-square)](https://packagist.org/packages/dominservice/laravel_chat)
+[![Latest Stable Version](https://poser.pugx.org/dominservice/laravel_chat/v/stable.svg)](https://packagist.org/packages/dominservice/laravel_chat)
 [![Total Downloads](https://img.shields.io/packagist/dt/dominservice/laravel_chat.svg?style=flat-square)](https://packagist.org/packages/dominservice/laravel_chat)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
