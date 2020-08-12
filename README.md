@@ -51,7 +51,7 @@ php artisan migrate
 #### Get User Conversations:
 
 ```php
-$convs = LaravelChat::getUserConversations($user_id);
+$convs = LaravelChat::getConversations($user_id);
 ```
 This will return you a "Illuminate\Support\Collection" of "Dominservice\LaravelChat\Entities\Conversation" objects.
 And foreach Conversation there, you will have the last message of the conversation, and the participants of the conversation.
@@ -142,7 +142,7 @@ $conv = LaravelChat::markReadAllMessagesInConversation($conv_id, $user_id);
 public function conversations($convId=null) {
     $currentUser = Auth::user();
     //get the conversations
-    $convs = LaravelChat::getUserConversations( $currentUser->id );
+    $convs = LaravelChat::getConversations( $currentUser->id );
     //array for storing our users data, as that LaravelChat only provides user id's
     $participants = [];
     
