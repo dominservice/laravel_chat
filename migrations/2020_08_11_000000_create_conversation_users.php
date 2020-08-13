@@ -17,9 +17,11 @@ class CreateConversationUsers extends Migration {
         {
             $table->unsignedBigInteger('conversation_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('parent_type')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
 
 
-            $table->primary(array('conversation_id', 'user_id'));
+            $table->primary(array('conversation_id', 'user_id', 'parent_type', 'parent_id'));
 
         });
     }

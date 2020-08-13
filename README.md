@@ -100,7 +100,7 @@ Simply add a message to an exiting conversation, content is the message text.
 #### Create a new conversation:
 
 ```php
-$conv = LaravelChat::createConversation($users_ids=array());
+$conv = LaravelChat::createConversation($users_ids=array(), $relationType = null, $relationId = null);
 ```
 Creates a new conversation with the users id's you passed in the array.
 

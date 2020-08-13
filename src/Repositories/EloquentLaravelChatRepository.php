@@ -7,8 +7,8 @@ use Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException;
 use Dominservice\LaravelChat\Exceptions\UserNotInConvException;
 use Dominservice\LaravelChat\Models\Eloquent\ConversationUsers;
 use Dominservice\LaravelChat\Models\Eloquent\MessageStatus;
-use Dominservice\LaravelChat\Models\Eloquent\Message as MessageEloquent;
-use Dominservice\LaravelChat\Models\Eloquent\Conversation as ConversationEloquent;
+use Dominservice\LaravelChat\Models\Eloquent\Message;
+use Dominservice\LaravelChat\Models\Eloquent\Conversation;
 
 /**
  * Class EloquentLaravelChatRepository
@@ -20,53 +20,52 @@ class EloquentLaravelChatRepository
     const UNREAD = 1;
     const READ = 2;
     const ARCHIVED = 3;
-    
+
     protected $messagesTable;
     protected $messagesStatusTable;
     protected $conversationUsersTable;
 
     public function __construct($userModel) {
-        $this->messagesTable = DB::getTablePrefix() . (new MessageEloquent())->getTable();
+        $this->messagesTable = DB::getTablePrefix() . (new Message())->getTable();
         $this->messagesStatusTable = DB::getTablePrefix() . (new MessageStatus())->getTable();
         $this->conversationUsersTable = (new ConversationUsers())->getTable();
     }
 
     public function createConversation($usersIds, $relationType = null, $relationId = null)
     {
+        $eventData = [
+            'usersIds' => $usersIds,
+            'convId' => null
+        ];
         if (count((array)$usersIds ) > 1) {
             //create new conv
-            $conv = new ConversationEloquent();
-            $conv->parent_type = $relationType;
-            $conv->parent_id = $relationId;
-            $conv->save();
+            $conversation = new Conversation();
+            $conversation->parent_type = $relationType;
+            $conversation->parent_id = $relationId;
+            $conversation->save();
 
             //get the id of conv, and add foreach user a line in conversation_users
             foreach ( $usersIds as $user_id ) {
-                $this->addConvUserRow($conv->id, $user_id);
+                $conversationUser = new ConversationUsers();
+                $conversationUser->conversation_id = $conversation->id;
+                $conversationUser->user_id = $user_id;
+                $conversationUser->parent_type = $relationType;
+                $conversationUser->parent_id = $relationId;
+                $conversationUser->save();
             }
-            $eventData = [
-                'usersIds' => $usersIds,
-                'convId' => $conv->id
-            ];
-            return $eventData;
-        } else {
-            throw new NotEnoughUsersInConvException;
+            return $conversation->id;
         }
-    }
-
-    protected function addConvUserRow($conv_id, $user_id) {
-        DB::table($this->conversationUsersTable)->insert(
-            array('conversation_id' => $conv_id, 'user_id' => $user_id)
-        );
+        return null;
     }
 
     public function addMessageToConversation($conv_id, $user_id, $content) {
         //check if user of message is in conversation
-        if ( !$this->isUserInConversation($conv_id, $user_id) )
-            throw new UserNotInConvException;
+        if ( !$this->isUserInConversation($conv_id, $user_id) ) {
+            return null;
+        }
 
         //if so add new message
-        $message = new MessageEloquent();
+        $message = new Message();
         $message->sender_id = $user_id;
         $message->conversation_id = $conv_id;
         $message->content = $content;
@@ -94,22 +93,27 @@ class EloquentLaravelChatRepository
 
         return [
             'senderId' => $user_id,
-            'convUsersIds' =>$usersInConv,
+            'convUsersIds' => $usersInConv,
             'content' => $content,
             'convId' => $conv_id
         ];
     }
 
-    public function getConversationByTwoUsers($userA_id, $userB_id)
+    public function getConversationByTwoUsers($userA_id, $userB_id, $relationType = null, $relationId = null)
     {
-        $results = ConversationUsers::select('conversation_id')
-            ->whereIn('user_id', [$userA_id, $userB_id])
+        $results = ConversationUsers::select('conversation_id');
+        if (!empty($relationType) && !empty($relationId)) {
+            $results->where('parent_type', $relationType)
+                ->where('parent_id', $relationId);
+        }
+        $results->whereIn('user_id', [$userA_id, $userB_id])
             ->groupBy('conversation_id')
-            ->havingRaw("COUNT(conversation_id)=2")->first();
-        if ($results) {
+            ->havingRaw("COUNT(conversation_id)=2");
+
+        if ($results = $results->first()) {
             return $results->conversation_id;
         }
-        throw new ConversationNotFoundException;
+        return null;
     }
 
     public function markMessageAs($msgId, $userId, $status) {
@@ -187,7 +191,7 @@ class EloquentLaravelChatRepository
      */
     public function markUnreadAllMessagesInConversation($convId, $userId)
     {
-        $messagesT = DB::getTablePrefix() . (new MessageEloquent())->getTable();
+        $messagesT = DB::getTablePrefix() . (new Message())->getTable();
         $messageStatuses = MessageStatus::whereIn('message_id', DB::Raw("SELECT `id`
               FROM `{$messagesT}`
               WHERE `conversation_id`='{$convId}'
@@ -231,7 +235,7 @@ class EloquentLaravelChatRepository
         } else {
             $orderBy = 'asc';
         }
-        $messageT = (new MessageEloquent())->getTable();
+        $messageT = (new Message())->getTable();
         $messageStatusT = (new MessageStatus())->getTable();
         return MessageStatus::select(
             DB::Raw("`{$this->messagesTable}`.`id` as `msgId`"),
@@ -249,7 +253,7 @@ class EloquentLaravelChatRepository
 
     public function getConversations($userId, $relationType = null, $relationId = null)
     {
-        $conversation = ConversationEloquent::with(['users'=>function($q) use ($userId) {
+        $conversation = Conversation::with(['users'=>function($q) use ($userId) {
             $q->where('user_id', '!=', $userId);
         }])->whereRaw(DB::Raw("(SELECT COUNT(`message_id`)
                 FROM `{$this->messagesTable}`

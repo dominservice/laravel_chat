@@ -28,7 +28,7 @@ class LaravelChat extends EloquentLaravelChatRepository{
         $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
         parent::__construct($userModel);
     }
-    
+
     /**
      * @param $senderId
      * @param $receiverId
@@ -40,16 +40,14 @@ class LaravelChat extends EloquentLaravelChatRepository{
      */
     public function sendMessageBetweenTwoUsers($senderId, $receiverId, $content, $relationType = null, $relationId = null)
     {
-        //get conversation by two users
-        try {
-            $conv = $this->getConversationByTwoUsers($senderId, $receiverId, $relationType, $relationId);
-        } catch (ConversationNotFoundException $ex) {
-            //if conversation doesnt exist, create it
+        $conv = $this->getConversationByTwoUsers($senderId, $receiverId, $relationType, $relationId);
+        if ($conv === null) {
             $conv = $this->createConversation([$senderId, $receiverId], $relationType, $relationId);
-            $conv = $conv['convId'];
         }
-
-        //add message to new conversation
-        return $this->addMessageToConversation($conv, $senderId, $content);
+        if($conv) {
+            return $this->addMessageToConversation($conv, $senderId, $content);
+        } else {
+            return null;
+        }
     }
 }
