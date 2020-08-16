@@ -17,7 +17,7 @@ composer require dominservice/laravel_chat
 Or place manually in composer.json:
 ```
 "require": {
-    "dominservice/laravel_chat": "^4.3"
+    "dominservice/laravel_chat": "^1.0"
 }
 ```
 Run:
