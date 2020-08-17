@@ -56,7 +56,10 @@ class CreateConversationsTables extends Migration {
      */
     public function down()
     {
+        Schema::drop('message_statuses');
+        Schema::drop('messages');
         Schema::drop('conversation_users');
+        Schema::drop('conversations');
     }
 
 }
