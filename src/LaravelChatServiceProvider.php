@@ -1,7 +1,8 @@
 <?php namespace Dominservice\LaravelChat;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
-//use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
 
 /**
  * Class LaravelChatServiceProvider
@@ -16,14 +17,18 @@ class LaravelChatServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = false;
 
-    public function boot() {
+    public function boot(Filesystem $filesystem) {
         $this->publishes([
             __DIR__ . '/../config/laravel_chat.php' => config_path('laravel_chat.php'),
         ], 'config');
 
         // Publish your migrations
+//        $this->publishes([
+//            __DIR__ . '/../migrations/' => base_path('/database/migrations')
+//        ], 'migrations');
+
         $this->publishes([
-            __DIR__ . '/../migrations/' => base_path('/database/migrations')
+            __DIR__.'/../database/migrations/create_conversations_tables.php.stub' => $this->getMigrationFileName($filesystem),
         ], 'migrations');
     }
 
@@ -34,20 +39,20 @@ class LaravelChatServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/laravel_chat.php',
+            'laravel_chat'
+        );
 
-//        $this->app->bind('Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository',
-//            function($app) use($userModel) {
-//                return new EloquentLaravelChatRepository($userModel);
-//            });
+//        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
 
-        // Register 'laravel_chat'
-        $this->app['laravel_chat'] = $this->app->singleton('laravel_chat', function($app) {
-            return new LaravelChat(
-                $app['Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository'],
-                $app['Illuminate\Contracts\Events\Dispatcher'] //Illuminate\Events\Dispatcher
-            );
-        });
+//        // Register 'laravel_chat'
+//        $this->app['laravel_chat'] = $this->app->singleton('laravel_chat', function($app) {
+//            return new LaravelChat(
+//                $app['Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository'],
+//                $app['Illuminate\Contracts\Events\Dispatcher'] //Illuminate\Events\Dispatcher
+//            );
+//        });
 	}
 
 	/**
@@ -59,5 +64,22 @@ class LaravelChatServiceProvider extends ServiceProvider {
 	{
 		return array();
 	}
+
+    /**
+     * Returns existing migration file if found, else uses the current timestamp.
+     *
+     * @param Filesystem $filesystem
+     * @return string
+     */
+    protected function getMigrationFileName(Filesystem $filesystem): string
+    {
+        $timestamp = date('Y_m_d_His');
+
+        return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
+            ->flatMap(function ($path) use ($filesystem) {
+                return $filesystem->glob($path.'*_create_conversations_tables.php');
+            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_conversations_tables.php")
+            ->first();
+    }
 
 }
