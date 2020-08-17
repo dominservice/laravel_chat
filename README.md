@@ -201,6 +201,7 @@ conversation_between($receiverId, $senderId = null);
 Get conversation messages. If `userId` is `null` then set current user id.
 ```php
 conversation_messages($convId, $userId = null, $newToOld = true);
+conversation_messages_unread($convId, $userId = null, $newToOld = true);
 ```
 Mark messages. If `userId` is `null` then set current user id.
 ```php
@@ -216,9 +217,4 @@ conversation_mark_as_unread_all($convId, $userId = null);
 
 # Credits
 
-#### [tzookb/tbmsg](https://github.com/tzookb/tbmsg)
-
-# Changes
-If you see any bugs or you want to suggest changes, or you want to create corrections yourself, write to me __biuro@dso.biz.pl__
- 
-I am willing to cooperate
+[tzookb/tbmsg](https://github.com/tzookb/tbmsg)
