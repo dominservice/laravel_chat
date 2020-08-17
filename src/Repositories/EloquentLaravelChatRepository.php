@@ -245,8 +245,33 @@ class EloquentLaravelChatRepository
             ->join($messageT, $messageT.'.id', $messageStatusT.'.message_id')
             ->where($messageT.'.conversation_id', $convId)
             ->where($messageStatusT.'.user_id', $userId)
-            ->whereIn($messageStatusT.'.status', [self::DELETED, self::ARCHIVED])
-            ->orderBy($messageT.'.created_at', $orderBy);
+            ->whereNotIn($messageStatusT.'.status', [self::DELETED, self::ARCHIVED])
+            ->orderBy($messageT.'.created_at', $orderBy)
+            ->get();
+    }
+
+    public function getConversationUnreadMessages($convId, $userId, $newToOld = true)
+    {
+        if ($newToOld) {
+            $orderBy = 'desc';
+        } else {
+            $orderBy = 'asc';
+        }
+        $messageT = (new Message())->getTable();
+        $messageStatusT = (new MessageStatus())->getTable();
+        return MessageStatus::select(
+            DB::Raw("`{$this->messagesTable}`.`id` as `msgId`"),
+            $messageT.'.content',
+            $messageStatusT.'.status',
+            $messageT.'.created_at',
+            DB::Raw("`{$this->messagesTable}`.`sender_id` as `userId`")
+        )
+            ->join($messageT, $messageT.'.id', $messageStatusT.'.message_id')
+            ->where($messageT.'.conversation_id', $convId)
+            ->where($messageStatusT.'.user_id', $userId)
+            ->where($messageStatusT.'.status', self::UNREAD)
+            ->orderBy($messageT.'.created_at', $orderBy)
+            ->get();
     }
 
     public function getConversations($userId, $relationType = null, $relationId = null)
@@ -272,7 +297,7 @@ class EloquentLaravelChatRepository
                 $datum->relation = $relations[$datum->parent_type]::where('id', $datum->parent_id)->first();
             }
         }
-        
+
         return $data;
     }
 }

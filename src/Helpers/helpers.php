@@ -144,6 +144,18 @@ if (!function_exists('conversation_messages')) {
         $userId = !$userId && \Auth::check() ? \Auth::user()->id : $userId;
         return (new Dominservice\LaravelChat\LaravelChat)->getConversationMessages($convId, $userId, $newToOld);
     }
+
+    /**
+     * @param $convId
+     * @param null $userId
+     * @param bool $newToOld
+     * @return mixed
+     */
+    function conversation_messages_unread($convId, $userId = null, $newToOld = true)
+    {
+        $userId = !$userId && \Auth::check() ? \Auth::user()->id : $userId;
+        return (new Dominservice\LaravelChat\LaravelChat)->getConversationUnreadMessages($convId, $userId, $newToOld);
+    }
 }
 
 // Mark messages as DELETED | UNREAD | READ | ARCHIVED
