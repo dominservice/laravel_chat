@@ -23,12 +23,10 @@ class EloquentLaravelChatRepository
 
     protected $messagesTable;
     protected $messagesStatusTable;
-    protected $conversationUsersTable;
 
-    public function __construct($userModel) {
+    public function __construct() {
         $this->messagesTable = DB::getTablePrefix() . (new Message())->getTable();
         $this->messagesStatusTable = DB::getTablePrefix() . (new MessageStatus())->getTable();
-        $this->conversationUsersTable = (new ConversationUsers())->getTable();
     }
 
     public function createConversation($usersIds, $relationType = null, $relationId = null)
@@ -254,7 +252,7 @@ class EloquentLaravelChatRepository
     public function getConversations($userId, $relationType = null, $relationId = null)
     {
         $conversation = Conversation::with(['users'=>function($q) use ($userId) {
-            $q->where('user_id', '!=', $userId);
+//            $q->where('user_id', '!=', $userId);
         }])->whereRaw(DB::Raw("(SELECT COUNT(`message_id`)
                 FROM `{$this->messagesTable}`
                 INNER JOIN `{$this->messagesStatusTable}` ON `{$this->messagesTable}`.`id`=`{$this->messagesStatusTable}`.`message_id`
@@ -274,7 +272,7 @@ class EloquentLaravelChatRepository
                 $datum->relation = $relations[$datum->parent_type]::where('id', $datum->parent_id)->first();
             }
         }
-
+        
         return $data;
     }
 }

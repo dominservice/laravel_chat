@@ -17,7 +17,7 @@ composer require dominservice/laravel_chat
 Or place manually in composer.json:
 ```
 "require": {
-    "dominservice/laravel_chat": "^1.0"
+    "dominservice/laravel_chat": "^4.3"
 }
 ```
 Run:
@@ -54,19 +54,19 @@ php artisan migrate
 $convs = LaravelChat::getConversations($user_id);
 ```
 This will return you a "Illuminate\Support\Collection" of "Dominservice\LaravelChat\Entities\Conversation" objects.
-And foreach Conversation there, you will have the last message of the conversation, and the participants of the conversation.
+And foreach Conversation there, you will have the last message of the conversation, and the users of the conversation.
 Example:
 ```php
 foreach ( $convs as $conv ) {
-    $getNumOfParticipants = $conv->getNumOfParticipants();
-    $participants = $conv->getAllParticipants();
+    $getNumOfUsers = $conv->getNumOfUsers();
+    $users = $conv->users; /* Collection */
             
     /* $lastMessage Dominservice\LaravelChat\Entities\Message */
     $lastMessage = $conv->getLastMessage();
             
-    $senderId = $lastMessage->getSender();
-    $content = $lastMessage->getContent();
-    $status = $lastMessage->getStatus();
+    $senderId = $lastMessage->sender;
+    $content = $lastMessage->content;
+    $status = $lastMessage->status;
 }
 ```
 
@@ -76,13 +76,14 @@ foreach ( $convs as $conv ) {
 $conv = LaravelChat::getConversationMessages($conv_id, $user_id);
 ```
 This will return you a "Dominservice\LaravelChat\Entities\Conversation" object.
-On the object you could get all messages, all participants, conv_id, and more, simply browse the object itself.
+On the object you could get all messages, all users, conv_id, and more, simply browse the object itself.
 Example:
 ```php
-foreach ( $conv->getAllMessages() as $msg ) {
-    $senderId = $msg->getSender();
-    $content = $msg->getContent();
-    $status = $msg->getStatus();
+foreach ( $conv->messages as $msg ) {
+    $senderId = $msg->sender;
+    $content = $msg->content;
+    $status = $msg->status; /* Collection statuses for all users */
+    $statusUser = $msg->statusForUser($userId = null);
 }
 ```
 #### Get the conversation id of a conversation between two users:
@@ -144,18 +145,18 @@ public function conversations($convId=null) {
     //get the conversations
     $convs = LaravelChat::getConversations( $currentUser->id );
     //array for storing our users data, as that LaravelChat only provides user id's
-    $participants = [];
+    $users = [];
     
-    //gathering participants
+    //gathering users
     foreach ( $convs as $conv ) {
-        $participants = array_merge($participants, $conv->getAllParticipants());
+        $users = array_merge($users, $conv->getAllUsers());
     }
     //making sure each user appears once
-    $participants = array_unique($participants);
+    $users = array_unique($users);
     
-    //getting all data of participants
-    if ( !empty($participants) ) {
-        $users = User::whereIn('id', $participants)->with('profileImage')->getDictionary();
+    //getting all data of users
+    if ( !empty($users) ) {
+        $users = User::whereIn('id', $users)->with('profileImage')->getDictionary();
     }
             
     return View::make('conversations_page')

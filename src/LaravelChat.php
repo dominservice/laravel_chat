@@ -25,8 +25,7 @@ class LaravelChat extends EloquentLaravelChatRepository{
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function __construct() {
-        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
-        parent::__construct($userModel);
+        parent::__construct();
     }
 
     /**
