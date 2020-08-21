@@ -26,6 +26,8 @@ class CreateConversationsTables extends Migration {
         {
             $table->unsignedBigInteger('conversation_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('parent_id');
+            $table->string('parent_type');
             $table->primary(array('conversation_id', 'user_id'));
         });
         Schema::create('messages', function(Blueprint $table)
