@@ -13,13 +13,13 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.3",
         "laravel/framework": "^8.0"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
         "phpunit/phpunit": "^8.5",
-        "illuminate/filesystem": "^7.0",
+        "illuminate/filesystem": "^8.0",
         "league/factory-muffin": "~2.0"
     },
     "require-all": true,
