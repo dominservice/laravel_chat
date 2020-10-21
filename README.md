@@ -6,7 +6,7 @@
 This package will allow you to add a full user messaging system into your Laravel application.
 
 ### Notice
-This package is for Laravel >=7.0
+This package is for Laravel >=8.0
 
 This package is an updated copy of [tzookb/tbmsg](https://github.com/tzookb/tbmsg) under laravel 7. *
 
