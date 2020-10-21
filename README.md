@@ -8,7 +8,7 @@ This package will allow you to add a full user messaging system into your Larave
 ### Notice
 This package is for Laravel >=8.0
 
-This package is an updated copy of [tzookb/tbmsg](https://github.com/tzookb/tbmsg) under laravel 7. *
+This package is an updated copy of [tzookb/tbmsg](https://github.com/tzookb/tbmsg) under laravel 8. *
 
 ## Installation
 ```
@@ -17,7 +17,7 @@ composer require dominservice/laravel_chat
 Or place manually in composer.json:
 ```
 "require": {
-    "dominservice/laravel_chat": "^4.3"
+    "dominservice/laravel_chat": "^2,0"
 }
 ```
 Run:
