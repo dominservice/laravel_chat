@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=7.2",
-        "laravel/framework": "^7.0"
+        "laravel/framework": "^8.0"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
@@ -24,13 +24,13 @@
     },
     "require-all": true,
 
-    "autoload": {    
+    "autoload": {
         "psr-0": {
             "Dominservice\\LaravelChat": "src/"
         },
         "files": [
             "src/Helpers/helpers.php"
         ]
-    },    
-    "minimum-stability": "dev"    
+    },
+    "minimum-stability": "dev"
 }
