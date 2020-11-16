@@ -1,9 +1,9 @@
 {
-    "name": "dominservice/laravel_chat",
+    "name": "dominservice/laravel-list-generator",
     "type": "library",
-    "description": "users messaging system",
-    "keywords": ["laravel", "php", "messaging", "message-system", "chat", "laravel-messenger"],
-    "homepage": "https://github.com/dominservice/laravel_chat",
+    "description": "Export data to various formats.",
+    "keywords": ["laravel", "php", "list", "generator"],
+    "homepage": "https://github.com/dominservice/laravel-list-generator",
     "license": "MIT",
     "authors": [
         {
@@ -13,18 +13,20 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": "^7.4",
+        "symfony/console": "^5.1",
+        "symfony/filesystem": "^5.1",
+        "symfony/finder": "^5.1",
+        "symfony/yaml": "^5.1",
+        "doctrine/dbal": "~2.5",
+        "zendframework/zend-db": "^2.6",
         "laravel/framework": "^8.0"
     },
     "require-all": true,
-
     "autoload": {
         "psr-0": {
-            "Dominservice\\LaravelChat": "src/"
-        },
-        "files": [
-            "src/Helpers/helpers.php"
-        ]
+            "Dominservice\\LaravelListGenerator": "src/"
+        }
     },
     "minimum-stability": "dev"
 }
