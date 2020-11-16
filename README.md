@@ -1,47 +1,220 @@
-<h3 align="center">
-    <a href="https://github.com/umpirsky">
-        <img src="https://farm2.staticflickr.com/1709/25098526884_ae4d50465f_o_d.png" />
-    </a>
-</h3>
-<p align="center">
-  <a href="https://github.com/umpirsky/Symfony-Upgrade-Fixer">symfony upgrade fixer</a> &bull;
-  <a href="https://github.com/umpirsky/Twig-Gettext-Extractor">twig gettext extractor</a> &bull;
-  <a href="https://github.com/umpirsky/wisdom">wisdom</a> &bull;
-  <a href="https://github.com/umpirsky/centipede">centipede</a> &bull;
-  <a href="https://github.com/umpirsky/PermissionsHandler">permissions handler</a> &bull;
-  <a href="https://github.com/umpirsky/Extraload">extraload</a> &bull;
-  <a href="https://github.com/umpirsky/Gravatar">gravatar</a> &bull;
-  <a href="https://github.com/umpirsky/locurro">locurro</a> &bull;
-  <a href="https://github.com/umpirsky/country-list">country list</a> &bull;
-  <a href="https://github.com/umpirsky/Transliterator">transliterator</a>
-</p>
+[![Latest Version](https://img.shields.io/github/release/dominservice/laravel_chat.svg?style=flat-square)](https://github.com/dominservice/laravel_chat/releases)
+[![Total Downloads](https://img.shields.io/packagist/dt/dominservice/laravel_chat.svg?style=flat-square)](https://packagist.org/packages/dominservice/laravel_chat)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-List Generator
-============
+# Laravel Chat
+This package will allow you to add a full user messaging system into your Laravel application.
 
-This package is used to export data to various formats.
+### Notice
+This package is for Laravel >=8.0
 
-Formats Available
------------------
+This package is an updated copy of [tzookb/tbmsg](https://github.com/tzookb/tbmsg) under laravel 8. *
 
-- Text
-- JSON
-- YAML
-- XML
-- HTML
-- CSV
-- SQL
-    * MySQL
-    * PostgreSQL
-    * SQLite
-- PHP
-- XLIFF
+## Installation
+```
+composer require dominservice/laravel_chat
+```
+Or place manually in composer.json:
+```
+"require": {
+    "dominservice/laravel_chat": "^2.0"
+}
+```
+Run:
+```
+composer update
+```
+Add the service provider to `config/app.php` 
+```php
+'providers' => [
+    Dominservice\LaravelChat\LaravelChatServiceProvider::class,
+],
 
-Lists Generated
----------------
+(...)
 
-* [Country List](https://github.com/umpirsky/country-list)
-* [Currency List](https://github.com/umpirsky/currency-list)
-* [Language List](https://github.com/umpirsky/language-list)
-* [Locale List](https://github.com/umpirsky/locale-list)
-* [TLD List](https://github.com/umpirsky/tld-list)
+'aliases' => [
+    'LaravelChat' => Dominservice\LaravelChat\Facade\LaravelChat::class,
+]
+```
+Publish config:
+
+```
+php artisan vendor:publish --provider="Dominservice\LaravelChat\LaravelChatServiceProvider"
+```
+Migrate
+```
+php artisan migrate
+```
+
+# Usage
+
+#### Get User Conversations:
+
+```php
+$convs = LaravelChat::getConversations($user_id);
+```
+This will return you a "Illuminate\Support\Collection" of "Dominservice\LaravelChat\Entities\Conversation" objects.
+And foreach Conversation there, you will have the last message of the conversation, and the users of the conversation.
+Example:
+```php
+foreach ( $convs as $conv ) {
+    $getNumOfUsers = $conv->getNumOfUsers();
+    $users = $conv->users; /* Collection */
+            
+    /* $lastMessage Dominservice\LaravelChat\Entities\Message */
+    $lastMessage = $conv->getLastMessage();
+            
+    $senderId = $lastMessage->sender;
+    $content = $lastMessage->content;
+    $status = $lastMessage->status;
+}
+```
+
+#### Get User specific conversation:
+
+```php
+$conv = LaravelChat::getConversationMessages($conv_id, $user_id);
+```
+This will return you a "Dominservice\LaravelChat\Entities\Conversation" object.
+On the object you could get all messages, all users, conv_id, and more, simply browse the object itself.
+Example:
+```php
+foreach ( $conv->messages as $msg ) {
+    $senderId = $msg->sender;
+    $content = $msg->content;
+    $status = $msg->status; /* Collection statuses for all users */
+    $statusUser = $msg->statusForUser($userId = null);
+}
+```
+#### Get the conversation id of a conversation between two users:
+
+```php
+$conv = LaravelChat::getConversationByTwoUsers($userA_id, $userB_id);
+```
+Simply gives you an id of the conversation between two users, this was created for redirecting to the conversation page when user tries to send a message to another user, so if there is no id returned that means that those users has no conversation yet, so we could create one.
+#### Add a new message to conversation:
+
+```php
+$conv = LaravelChat::addMessageToConversation($conv_id, $user_id, $content);
+```
+Simply add a message to an exiting conversation, content is the message text.
+#### Create a new conversation:
+
+```php
+$conv = LaravelChat::createConversation($users_ids=array(), $relationType = null, $relationId = null);
+```
+Creates a new conversation with the users id's you passed in the array.
+
+#### Get all users in conversation:
+
+```php
+$conv = LaravelChat::getUsersInConversation($conv_id);
+```
+returns an array of user id in the conversation.
+
+#### Delete conversation:
+
+```php
+$conv = LaravelChat::deleteConversation($conv_id, $user_id);
+```
+"Deletes" the conversation from a specifc user view.
+#### Check if user is in conversation:
+
+```php
+$conv = LaravelChat::isUserInConversation($conv_id, $user_id);
+```
+True or False if user is in conversation.
+
+#### Get number of unread messages for specific user:
+
+```php
+$conv = LaravelChat::getNumOfUnreadMsgs($user_id);
+```
+return an integer of number of unread messages for specific user.
+
+#### Mark all messages as "read" for specifc user in conversation:
+
+```php
+$conv = LaravelChat::markReadAllMessagesInConversation($conv_id, $user_id);
+```
+
+### Example
+```php
+public function conversations($convId=null) {
+    $currentUser = Auth::user();
+    //get the conversations
+    $convs = LaravelChat::getConversations( $currentUser->id );
+    //array for storing our users data, as that LaravelChat only provides user id's
+    $users = [];
+    
+    //gathering users
+    foreach ( $convs as $conv ) {
+        $users = array_merge($users, $conv->getAllUsers());
+    }
+    //making sure each user appears once
+    $users = array_unique($users);
+    
+    //getting all data of users
+    if ( !empty($users) ) {
+        $users = User::whereIn('id', $users)->with('profileImage')->getDictionary();
+    }
+            
+    return View::make('conversations_page')
+        ->with('users', $users)
+        ->with('user', $currentUser)
+        ->with('convs', $convs);
+}
+```
+## Helpers
+Get all conversations for user. If `userId` is `null` then set current user id.
+```php
+get_conversations($userId = null);
+```
+Create conversations between selected users, in array must be `id` list.
+```php
+set_conversation($users = []);
+```
+Delete conversations for user. If `userId` is `null` then set current user id.
+```php
+delete_conversation($convId, $userId = null);
+```
+Check is user in conversations. If `userId` is `null` then set current user id.
+```php
+in_conversation($convId, $userId = null);
+```
+Add message to conversations. If `userId` is `null` then set current user id.
+```php
+conversation_add_message($convId, $content, $userId = null);
+```
+Add message to conversations between two users, it also create conversation if not exist, or add to exist. If `senderId` is `null` then set current user id.
+```php
+conversation_add_message_between($content, $receiverId, $senderId = null);
+```
+Get count unread messages for user. If `userId` is `null` then set current user id.
+```php
+conversation_unread_count($userId = null);
+```
+Get conversation between two users. If `senderId` is `null` then set current user id.
+```php
+conversation_between($receiverId, $senderId = null);
+```
+Get conversation messages. If `userId` is `null` then set current user id.
+```php
+conversation_messages($convId, $userId = null, $newToOld = true);
+conversation_messages_unread($convId, $userId = null, $newToOld = true);
+```
+Mark messages. If `userId` is `null` then set current user id.
+```php
+conversation_mark_as_archived($msgId, $userId = null);
+conversation_mark_as_deleted($msgId, $userId = null);
+conversation_mark_as_unread($msgId, $userId = null);
+conversation_mark_as_read($msgId, $userId = null);
+
+conversation_mark_as_read_all($convId, $userId = null);
+conversation_mark_as_unread_all($convId, $userId = null);
+```
+
+
+# Credits
+
+[tzookb/tbmsg](https://github.com/tzookb/tbmsg)
