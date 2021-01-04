@@ -17,10 +17,9 @@
         "laravel/framework": "^8.0"
     },
     "require-all": true,
-
     "autoload": {
-        "psr-0": {
-            "Dominservice\\LaravelChat": "src/"
+        "psr-4": {
+            "Dominservice\\LaravelChat\\": "src/"
         },
         "files": [
             "src/Helpers/helpers.php"
