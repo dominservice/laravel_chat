@@ -31,10 +31,6 @@ class EloquentLaravelChatRepository
 
     public function createConversation($usersIds, $relationType = null, $relationId = null)
     {
-        $eventData = [
-            'usersIds' => $usersIds,
-            'convId' => null
-        ];
         if (count((array)$usersIds ) > 1) {
             //create new conv
             $conversation = new Conversation();
@@ -277,7 +273,6 @@ class EloquentLaravelChatRepository
     public function getConversations($userId, $relationType = null, $relationId = null)
     {
         $conversation = Conversation::with(['users'=>function($q) use ($userId) {
-//            $q->where('user_id', '!=', $userId);
         }])->whereRaw(DB::Raw("(SELECT COUNT(`message_id`)
                 FROM `{$this->messagesTable}`
                 INNER JOIN `{$this->messagesStatusTable}` ON `{$this->messagesTable}`.`id`=`{$this->messagesStatusTable}`.`message_id`

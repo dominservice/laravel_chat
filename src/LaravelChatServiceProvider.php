@@ -22,11 +22,6 @@ class LaravelChatServiceProvider extends ServiceProvider {
             __DIR__ . '/../config/laravel_chat.php' => config_path('laravel_chat.php'),
         ], 'config');
 
-        // Publish your migrations
-//        $this->publishes([
-//            __DIR__ . '/../migrations/' => base_path('/database/migrations')
-//        ], 'migrations');
-
         $this->publishes([
             __DIR__.'/../database/migrations/create_conversations_tables.php.stub' => $this->getMigrationFileName($filesystem),
         ], 'migrations');
@@ -43,16 +38,6 @@ class LaravelChatServiceProvider extends ServiceProvider {
             __DIR__.'/../config/laravel_chat.php',
             'laravel_chat'
         );
-
-//        $userModel = \Config::get('laravel_chat.user_model', \App\User::class);
-
-//        // Register 'laravel_chat'
-//        $this->app['laravel_chat'] = $this->app->singleton('laravel_chat', function($app) {
-//            return new LaravelChat(
-//                $app['Dominservice\LaravelChat\Repositories\Contracts\iLaravelChatRepository'],
-//                $app['Illuminate\Contracts\Events\Dispatcher'] //Illuminate\Events\Dispatcher
-//            );
-//        });
 	}
 
 	/**

@@ -1,11 +1,7 @@
 <?php
 namespace Dominservice\LaravelChat;
 
-use Config;
-use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
-
-
-
+use Illuminate\Support\Facades\Config;
 use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
 
 /**
