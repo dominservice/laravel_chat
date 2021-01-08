@@ -3,6 +3,8 @@
 if (!function_exists('get_conversations')) {
     /**
      * @param null $userId
+     * @param null $relationType
+     * @param null $relationId
      * @return array
      */
     function get_conversations($userId = null, $relationType = null, $relationId = null)
@@ -26,8 +28,9 @@ if (!function_exists('get_conversations')) {
 if (!function_exists('set_conversation')) {
     /**
      * @param array $users
-     * @return array|\Dominservice\LaravelChat\Models\Eloquent\Conversation
-     * @throws \Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException
+     * @param null $relationType
+     * @param null $relationId
+     * @return null[]|null
      */
     function set_conversation($users = [], $relationType = null, $relationId = null)
     {
@@ -37,7 +40,6 @@ if (!function_exists('set_conversation')) {
         return [
             'convId' => null
         ];
-
     }
 }
 
@@ -76,7 +78,7 @@ if (!function_exists('conversation_add_message')) {
      * @param $convId
      * @param $content
      * @param null $userId
-     * @return array|null[]
+     * @return array|null[]|null
      */
     function conversation_add_message($convId, $content, $userId = null)
     {
@@ -97,7 +99,7 @@ if (!function_exists('conversation_add_message_between')) {
      * @param null $senderId
      * @param null $relationType
      * @param null $relationId
-     * @return array
+     * @return array|null
      */
     function conversation_add_message_between($content, $receiverId, $senderId = null, $relationType = null, $relationId = null)
     {
@@ -109,7 +111,7 @@ if (!function_exists('conversation_add_message_between')) {
 if (!function_exists('conversation_unread_count')) {
     /**
      * @param null $userId
-     * @return int
+     * @return mixed
      */
     function conversation_unread_count($userId = null)
     {
@@ -122,8 +124,7 @@ if (!function_exists('conversation_between')) {
     /**
      * @param $receiverId
      * @param null $senderId
-     * @return int
-     * @throws \Dominservice\LaravelChat\Exceptions\ConversationNotFoundException
+     * @return int|null
      */
     function conversation_between($receiverId, $senderId = null)
     {

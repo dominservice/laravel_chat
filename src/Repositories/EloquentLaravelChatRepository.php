@@ -2,9 +2,6 @@
 namespace Dominservice\LaravelChat\Repositories;
 
 use DB;
-use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
-use Dominservice\LaravelChat\Exceptions\NotEnoughUsersInConvException;
-use Dominservice\LaravelChat\Exceptions\UserNotInConvException;
 use Dominservice\LaravelChat\Models\Eloquent\ConversationUsers;
 use Dominservice\LaravelChat\Models\Eloquent\MessageStatus;
 use Dominservice\LaravelChat\Models\Eloquent\Message;
