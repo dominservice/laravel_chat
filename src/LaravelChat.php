@@ -1,24 +1,20 @@
 <?php
 namespace Dominservice\LaravelChat;
 
-use Config;
-use Dominservice\LaravelChat\Exceptions\ConversationNotFoundException;
-
-
-
+use Illuminate\Support\Facades\Config;
 use Dominservice\LaravelChat\Repositories\EloquentLaravelChatRepository;
 
 /**
  * Class LaravelChat
  * @package Dominservice\LaravelChat
  */
-class LaravelChat extends EloquentLaravelChatRepository{
+class LaravelChat extends EloquentLaravelChatRepository
+{
 
     const DELETED = 0;
     const UNREAD = 1;
     const READ = 2;
     const ARCHIVED = 3;
-    protected $usersTableKey;
 
     /**
      * LaravelChat constructor.

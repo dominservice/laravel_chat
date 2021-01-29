@@ -16,6 +16,8 @@ class LaravelChat extends Facade
      *
      * @return string
      */
-    protected static function getFacadeAccessor() { return 'laravel_chat'; }
+    protected static function getFacadeAccessor() {
+        return 'laravel_chat';
+    }
 
 }

@@ -8,7 +8,8 @@ use Illuminate\Support\ServiceProvider;
  * Class LaravelChatServiceProvider
  * @package Dominservice\LaravelChat
  */
-class LaravelChatServiceProvider extends ServiceProvider {
+class LaravelChatServiceProvider extends ServiceProvider
+{
 
 	/**
 	 * Indicates if loading of the provider is deferred.
